@@ -47,7 +47,12 @@ function New-M365DSCStubFiles
     $workloads = @('ExchangeOnline', 'SecurityComplianceCenter', 'PnP', 'PowerPlatforms', 'MicrosoftTeams', 'MicrosoftGraph')
     foreach ($workload in $workloads)
     {
+<<<<<<< HEAD
         $ConnectionMode = New-M365DSCConnection -Workload $workload `
+=======
+        Write-Host "Connecting to {$($Module.Name)}"
+        $ConnectionMode = New-M365DSCConnection -Workload ($Module.Name) `
+>>>>>>> 5cbbb071fe9d1f9f87c15df0bc5d5838f7d59d9a
             -InboundParameters $PSBoundParameters
     }
     foreach ($Module in $dependencies.ModuleName)

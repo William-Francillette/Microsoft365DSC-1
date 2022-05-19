@@ -1,5 +1,61 @@
 # Change log for Microsoft365DSC
 
+<<<<<<< HEAD
+=======
+# 1.22.518.1
+
+* AADConditionalAccessPolicy
+  * Fixed export to remove the DeviceFilterMode property
+    when empty.
+* EXODataClassification
+  * Initial release
+* EXODataEncryptionPolicy
+  * Initial release
+* PPTenantIsolationSettings
+  * Fixed an issue where credentials weren't passed properly
+    during the export.
+* SPOSharingSettings
+  * Decoupling from SPOSharingSettings: add SharingCapability for "-my sites" aka: OneDrive
+
+# 1.22.511.1
+
+* AADNamedLocationPolicy
+ * Added error handling in the Get-TargetResource function.
+* EXOIRMConfiguration
+  * Initial release.
+* EXOMessageClassification
+  * Initial release.
+* EXOOMEConfiguration
+  * Initial release.
+* EXOOwaMailboxPolicy
+  * Fix where the update scenario was not setting the proper
+    values. (FIXES #1868)
+* EXOPerimeterConfiguration
+  * Initial release.
+* EXOResourceConfiguration
+  * Initial release.
+* IntuneApplicationControlPolicyWindows10
+  * Initial release.
+* TeamsUpdateManagementPolicy
+  * Initial release.
+* DEPENDENCIES
+  * Updated Microsoft.Graph.* modules to version 1.9.6.
+  * Updated ReverseDSC to version 2.0.0.11.
+* MISC
+  * Updated permissions for SharePoint in settings.json files.
+  * Added links to documentation to Teams Readme files
+  * Added and corrected some Exchange examples
+  * Added progress indicator to the Report generation
+
+# 1.22.504.1
+
+* EXOInboundConnector
+  * Added support for EFSkipIPs, EFSkipLastIP and EFUsers properties. (FIXES #1917)
+* DEPENDENCIES
+  * Updated Microsoft.PowerApps.Administration.PowerShell to version 2.0.147.
+  * Updated MicrosoftTeams to version 4.3.0.
+
+>>>>>>> 5cbbb071fe9d1f9f87c15df0bc5d5838f7d59d9a
 # 1.22.427.1
 
 * AADApplication
