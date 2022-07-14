@@ -17,6 +17,13 @@ function Get-TargetResource
         $Description,
 
         [Parameter()]
+        [ValidateSet("mdm","mdm,microsoftSense","configManager")]
+        [System.String]
+        $Technologies,
+
+# Parameters for technology: configMgr and mdm,microsoftSense
+#region settingCatalog
+        [Parameter()]
         [System.String[]]
         $AttackSurfaceReductionOnlyExclusions,
 
@@ -121,6 +128,101 @@ function Get-TargetResource
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $Assignments,
+#endregion
+#Parameters for technology: mdm
+#region settingTemplate
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ProcessCreationType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode")]
+    [System.String]
+    $AdvancedRansomewareProtectionType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $BlockPersistenceThroughWmiType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ScriptObfuscatedMacroCodeType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeMacroCodeAllowWin32ImportsType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsLaunchChildProcessType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "enable","auditMode", "blockDiskModification", "auditDiskModification")]
+    [System.String]
+    $GuardMyFoldersType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $UntrustedUSBProcessType,
+
+    [Parameter()]
+    [System.String[]]
+    $AttackSurfaceReductionExcludedPaths,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $UntrustedExecutableType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured", "enable","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeCommunicationAppsLaunchChildProcess,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $EmailContentExecutionType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ScriptDownloadedPayloadExecutionType,
+
+    [Parameter()]
+    [System.String[]]
+    $AdditionalGuardedFolders,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode", "warn")]
+    [System.String]
+    $AdobeReaderLaunchChildProcess,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsExecutableContentCreationOrLaunchType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode", "warn")]
+    [System.String]
+    $PreventCredentialStealingType,
+
+    [Parameter()]
+    [ValidateSet("userDefined","block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsOtherProcessInjectionType,
+
+    [Parameter()]
+    [System.String[]]
+    $GuardedFoldersAllowedAppPaths,
+#endregion
 
         [Parameter(Mandatory = $True)]
         [System.String]
@@ -180,7 +282,17 @@ function Get-TargetResource
     try
     {
         #Retrieve policy general settings
+
+        $repository="configurationPolicies"
         $policy = Get-MgDeviceManagementConfigurationPolicy -Identity $Identity -ErrorAction Stop
+        $currentTechnologies=$policy.technologies
+
+        if([string]::IsNullOrEmpty($currentTechnologies))
+        {
+            $repository="intents"
+            $policy = Get-MgDeviceManagementConfigurationPolicy -Identity $Identity -Repository $repository -ErrorAction Stop
+            $currentTechnologies="mdm"
+        }
 
         if ($null -eq $policy)
         {
@@ -191,18 +303,36 @@ function Get-TargetResource
         #Retrieve policy specific settings
         [array]$settings = Get-MgDeviceManagementConfigurationPolicySetting `
             -DeviceManagementConfigurationPolicyId $Identity `
+            -Repository $repository `
             -ErrorAction Stop
 
 
         $returnHashtable=@{}
         $returnHashtable.Add("Identity",$Identity)
-        $returnHashtable.Add("DisplayName",$policy.name)
+        if($policy.name)
+        {
+            $returnHashtable.Add("DisplayName",$policy.name)
+        }
+        else
+        {
+            $returnHashtable.Add("DisplayName",$policy.displayName)
+        }
+
         $returnHashtable.Add("Description",$policy.description)
+        $returnHashtable.Add("Technologies",$currentTechnologies)
 
         foreach ($setting in $settings)
         {
             $addToParameters=$true
-            $settingName=$setting.settingDefinitionId.Split("_")|Select-Object -Last 1
+            if($currentTechnologies -eq "mdm")
+            {
+                $definitionIdPrefix="deviceConfiguration--windows10EndpointProtectionConfiguration_defender"
+                $settingName=$setting.definitionId.replace("$definitionIdPrefix","")
+            }
+            else
+            {
+                $settingName=$setting.settingDefinitionId.Split("_")|Select-Object -Last 1
+            }
 
             switch ($setting."@odata.type")
             {
@@ -238,8 +368,10 @@ function Get-TargetResource
             }
 
         }
+
+
         $returnAssignments=@()
-        $returnAssignments+=Get-MgDeviceManagementConfigurationPolicyAssignments -DeviceManagementConfigurationPolicyId $Identity
+        $returnAssignments+=Get-MgDeviceManagementConfigurationPolicyAssignments -DeviceManagementConfigurationPolicyId $Identity -Repository $repository
         $returnHashtable.Add('Assignments',$returnAssignments)
 
         Write-Verbose -Message "Found Endpoint Protection Policy {$($policy.name)}"
@@ -290,6 +422,13 @@ function Set-TargetResource
         $Description,
 
         [Parameter()]
+        [ValidateSet("mdm","mdm,microsoftSense","configManager")]
+        [System.String]
+        $Technologies,
+
+# Parameters for technology: configMgr and mdm,microsoftSense
+#region settingCatalog
+        [Parameter()]
         [System.String[]]
         $AttackSurfaceReductionOnlyExclusions,
 
@@ -394,6 +533,101 @@ function Set-TargetResource
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $Assignments,
+#endregion
+#Parameters for technology: mdm
+#region settingTemplate
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ProcessCreationType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode")]
+    [System.String]
+    $AdvancedRansomewareProtectionType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $BlockPersistenceThroughWmiType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ScriptObfuscatedMacroCodeType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeMacroCodeAllowWin32ImportsType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsLaunchChildProcessType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "enable","auditMode", "blockDiskModification", "auditDiskModification")]
+    [System.String]
+    $GuardMyFoldersType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $UntrustedUSBProcessType,
+
+    [Parameter()]
+    [System.String[]]
+    $AttackSurfaceReductionExcludedPaths,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $UntrustedExecutableType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured", "enable","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeCommunicationAppsLaunchChildProcess,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $EmailContentExecutionType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ScriptDownloadedPayloadExecutionType,
+
+    [Parameter()]
+    [System.String[]]
+    $AdditionalGuardedFolders,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode", "warn")]
+    [System.String]
+    $AdobeReaderLaunchChildProcess,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsExecutableContentCreationOrLaunchType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode", "warn")]
+    [System.String]
+    $PreventCredentialStealingType,
+
+    [Parameter()]
+    [ValidateSet("userDefined","block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsOtherProcessInjectionType,
+
+    [Parameter()]
+    [System.String[]]
+    $GuardedFoldersAllowedAppPaths,
+#endregion
 
         [Parameter(Mandatory = $True)]
         [System.String]
@@ -420,7 +654,6 @@ function Set-TargetResource
         [System.String]
         $CertificateThumbprint
     )
-
     $ConnectionMode = New-M365DSCConnection -Workload 'MicrosoftGraph' `
         -InboundParameters $PSBoundParameters `
         -ProfileName 'beta'
@@ -446,35 +679,87 @@ function Set-TargetResource
     $PSBoundParameters.Remove("ApplicationSecret") | Out-Null
     $PSBoundParameters.Remove("CertificateThumbprint") | Out-Null
 
-    $templateReferenceId='5dd36540-eb22-4e7e-b19c-2a07772ba627_1'
+    switch ($Technologies) {
+        "configManager"
+        {
+            $templateReferenceId='5dd36540-eb22-4e7e-b19c-2a07772ba627_1'
+            $repository="configurationPolicies"
+        }
+        "mdm,microsoftSense"
+        {
+            $templateReferenceId='e8c053d6-9f95-42b1-a7f1-ebfd71c67a4b_1'
+            $repository="configurationPolicies"
+        }
+        "mdm"
+        {
+            $templateReferenceId='0e237410-1367-4844-bd7f-15fb0f08943b'
+            $repository="intents"
+        }
+    }
+
     $platforms='windows10'
-    $technologies='configManager'
 
     if ($Ensure -eq 'Present' -and $currentPolicy.Ensure -eq 'Absent')
     {
         Write-Verbose -Message "Creating new Endpoint Protection Policy {$DisplayName}"
+        $PSBoundParameters.Remove('Identity') | Out-Null
+        $PSBoundParameters.Remove('DisplayName') | Out-Null
+        $PSBoundParameters.Remove('Description') | Out-Null
+        $PSBoundParameters.Remove('Assignments') | Out-Null
+        $PSBoundParameters.Remove('Technologies') | Out-Null
 
-        $settings= Format-M365DSCIntuneSettingCatalogPolicySettings `
-            -DSCParams ([System.Collections.Hashtable]$PSBoundParameters)
+        if($Technologies -eq "mdm")
+        {
+            $settings= Format-M365DSCIntuneIntentSettings `
+                -DSCParams ([System.Collections.Hashtable]$PSBoundParameters) `
+                -SettingDefinitionIdPrefix "deviceConfiguration--windows10EndpointProtectionConfiguration_defender" `
+                -TemplateReferenceId $templateReferenceId
+        }
+        else
+        {
+            $settings= Format-M365DSCIntuneSettingCatalogPolicySettings `
+                -DSCParams ([System.Collections.Hashtable]$PSBoundParameters) `
+                -Technologies $Technologies
+        }
 
-        New-MgDeviceManagementConfigurationPolicy `
+        $policy=New-MgDeviceManagementConfigurationPolicy `
             -DisplayName $DisplayName `
             -Description $Description `
             -TemplateReferenceId $templateReferenceId `
             -Platforms $platforms `
-            -Technologies $technologies `
-            -Settings $settings
+            -Technologies $Technologies `
+            -Settings $settings `
+            -Repository $repository
 
         $assignmentsHash=Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $Assignments
-        Update-MgDeviceManagementConfigurationPolicyAssignments -DeviceManagementConfigurationPolicyId $policy.id -Targets $assignmentsHash
-
+        Update-MgDeviceManagementConfigurationPolicyAssignments `
+            -DeviceManagementConfigurationPolicyId $policy.id `
+            -Targets $assignmentsHash `
+            -Repository $repository
     }
     elseif ($Ensure -eq 'Present' -and $currentPolicy.Ensure -eq 'Present')
     {
         Write-Verbose -Message "Updating existing Endpoint Protection Policy {$($currentPolicy.DisplayName)}"
+        $PSBoundParameters.Remove('Identity') | Out-Null
+        $PSBoundParameters.Remove('DisplayName') | Out-Null
+        $PSBoundParameters.Remove('Description') | Out-Null
+        $PSBoundParameters.Remove('Assignments') | Out-Null
+        $PSBoundParameters.Remove('Technologies') | Out-Null
 
-        $settings= Format-M365DSCIntuneSettingCatalogPolicySettings `
-            -DSCParams ([System.Collections.Hashtable]$PSBoundParameters)
+
+        if($Technologies -eq "mdm")
+        {
+            $settings= Format-M365DSCIntuneIntentSettings `
+                -DSCParams ([System.Collections.Hashtable]$PSBoundParameters) `
+                -SettingDefinitionIdPrefix "deviceConfiguration--windows10EndpointProtectionConfiguration_defender" `
+                -TemplateReferenceId $templateReferenceId
+        }
+        else
+        {
+            $settings= Format-M365DSCIntuneSettingCatalogPolicySettings `
+                -DSCParams ([System.Collections.Hashtable]$PSBoundParameters) `
+                -Technologies $Technologies
+        }
 
         Update-MgDeviceManagementConfigurationPolicy `
             -Identity $Identity `
@@ -482,17 +767,20 @@ function Set-TargetResource
             -Description $Description `
             -TemplateReferenceId $templateReferenceId `
             -Platforms $platforms `
-            -Technologies $technologies `
-            -Settings $settings
+            -Technologies $Technologies `
+            -Settings $settings `
+            -Repository $repository
 
         $assignmentsHash=Convert-M365DSCDRGComplexTypeToHashtable -ComplexObject $Assignments
-        Update-MgDeviceManagementConfigurationPolicyAssignments -DeviceManagementConfigurationPolicyId $currentPolicy.Identity -Targets $assignmentsHash
-
+        Update-MgDeviceManagementConfigurationPolicyAssignments `
+            -DeviceManagementConfigurationPolicyId $currentPolicy.Identity `
+            -Targets $assignmentsHash `
+            -Repository $repository
     }
     elseif ($Ensure -eq 'Absent' -and $currentPolicy.Ensure -eq 'Present')
     {
         Write-Verbose -Message "Removing Endpoint Protection Policy {$($currentPolicy.DisplayName)}"
-        Remove-MgDeviceManagementConfigurationPolicy -Identity $Identity
+        Remove-MgDeviceManagementConfigurationPolicy -Identity $Identity -Repository $repository
     }
 }
 
@@ -514,6 +802,13 @@ function Test-TargetResource
         [System.String]
         $Description,
 
+        [Parameter()]
+        [ValidateSet("mdm","mdm,microsoftSense","configManager")]
+        [System.String]
+        $Technologies,
+
+# Parameters for technology: configMgr and mdm,microsoftSense
+#region settingCatalog
         [Parameter()]
         [System.String[]]
         $AttackSurfaceReductionOnlyExclusions,
@@ -619,6 +914,101 @@ function Test-TargetResource
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $Assignments,
+#endregion
+#Parameters for technology: mdm
+#region settingTemplate
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ProcessCreationType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode")]
+    [System.String]
+    $AdvancedRansomewareProtectionType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $BlockPersistenceThroughWmiType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ScriptObfuscatedMacroCodeType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeMacroCodeAllowWin32ImportsType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsLaunchChildProcessType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "enable","auditMode", "blockDiskModification", "auditDiskModification")]
+    [System.String]
+    $GuardMyFoldersType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $UntrustedUSBProcessType,
+
+    [Parameter()]
+    [System.String[]]
+    $AttackSurfaceReductionExcludedPaths,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $UntrustedExecutableType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured", "enable","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeCommunicationAppsLaunchChildProcess,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $EmailContentExecutionType,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $ScriptDownloadedPayloadExecutionType,
+
+    [Parameter()]
+    [System.String[]]
+    $AdditionalGuardedFolders,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode", "warn")]
+    [System.String]
+    $AdobeReaderLaunchChildProcess,
+
+    [Parameter()]
+    [ValidateSet("userDefined", "block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsExecutableContentCreationOrLaunchType,
+
+    [Parameter()]
+    [ValidateSet("notConfigured","userDefined", "enable","auditMode", "warn")]
+    [System.String]
+    $PreventCredentialStealingType,
+
+    [Parameter()]
+    [ValidateSet("userDefined","block","auditMode", "warn", "disable")]
+    [System.String]
+    $OfficeAppsOtherProcessInjectionType,
+
+    [Parameter()]
+    [System.String[]]
+    $GuardedFoldersAllowedAppPaths,
+#endregion
 
         [Parameter(Mandatory = $True)]
         [System.String]
@@ -781,10 +1171,21 @@ function Export-TargetResource
 
     try
     {
-        $policyTemplateID='5dd36540-eb22-4e7e-b19c-2a07772ba627_1'
-        [array]$policies = Get-MgDeviceManagementConfigurationPolicy `
+        $policyTemplateIDs='5dd36540-eb22-4e7e-b19c-2a07772ba627_1','e8c053d6-9f95-42b1-a7f1-ebfd71c67a4b_1'
+        $legacyPolicyTemplateID='0e237410-1367-4844-bd7f-15fb0f08943b'
+
+        $policies=@()
+        foreach($policyTemplateID in $policyTemplateIDs)
+        {
+            $policies += Get-MgDeviceManagementConfigurationPolicy `
+                -ErrorAction Stop `
+                -TemplateId $policyTemplateID
+        }
+
+        $policies += Get-MgDeviceManagementConfigurationPolicy `
             -ErrorAction Stop `
-            -TemplateId $policyTemplateID
+            -TemplateId $legacyPolicyTemplateID `
+            -Repository 'intents'
 
         if ($policies.Length -eq 0)
         {
@@ -796,7 +1197,12 @@ function Export-TargetResource
         }
         foreach ($policy in $policies)
         {
-            Write-Host "    |---[$i/$($policies.Count)] $($policy.Name)" -NoNewline
+            $policyName=$policy.Name
+            if([string]::IsNullOrEmpty($policyName))
+            {
+                $policyName=$policy.displayName
+            }
+            Write-Host "    |---[$i/$($policies.Count)] $policyName" -NoNewline
 
             $params = @{
                 Identity                            = $policy.id
@@ -888,6 +1294,7 @@ function Get-DeviceManagementConfigurationSettingInstanceValue
         $Setting
     )
 
+
     switch ($setting."@odata.type")
     {
         "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance"
@@ -899,8 +1306,13 @@ function Get-DeviceManagementConfigurationSettingInstanceValue
         {
             $settingValue= $setting.simpleSettingValue.value
         }
+        "#microsoft.graph.deviceManagementCollectionSettingInstance"
+        {
+            $settingValue= $setting.valueJson|ConvertFrom-Json
+        }
         Default
         {
+
             $settingValue=$setting.value
         }
     }
@@ -1010,6 +1422,91 @@ function Convert-M365DSCParamsToSettingInstance
     }
     return $results
 }
+function Format-M365DSCIntuneIntentSettings
+{
+    [CmdletBinding()]
+    [OutputType([System.Array])]
+    param(
+        [Parameter(Mandatory = 'true')]
+        [System.Collections.Hashtable]
+        $DSCParams,
+
+        [Parameter()]
+        [System.String]
+        $SettingDefinitionIdPrefix,
+
+        [Parameter()]
+        [System.String]
+        $TemplateReferenceId
+    )
+
+    $results = @()
+    $settingDefinitions=Get-MgDeviceManagementConfigurationSettingDefinition -TemplateReferenceId $TemplateReferenceId -Repository "intents"
+    $settingDefinitions=$settingDefinitions|Where-Object -FilterScript {$_.isTopLevel -eq "True"}
+    foreach($settingDefinition in $settingDefinitions)
+    {
+        $settingName=$settingDefinition.id.replace("$SettingDefinitionIdPrefix","")
+        $setting=@{}
+        switch ($settingDefinition.valueType) {
+            "string" {$settingType="#microsoft.graph.deviceManagementStringSettingInstance"}
+            "boolean" {$settingType="#microsoft.graph.deviceManagementBooleanSettingInstance"}
+            "int32" {$settingType="#microsoft.graph.deviceManagementIntegerSettingInstance"}
+            "collection" {$settingType="#microsoft.graph.deviceManagementCollectionSettingInstance"}
+            Default {$settingType="#microsoft.graph.deviceManagementComplexSettingInstance"}
+        }
+        $setting.Add("@odata.type",$settingType)
+        $setting.Add("definitionId", $settingDefinition.id)
+        if($DSCParams.$settingName)
+        {
+            $setting.Add("valueJson", ($DSCParams.$settingName|ConvertTo-Json -Depth 20))
+
+        }
+        else
+        {
+            if($settingDefinition.valueType -eq "collection")
+            {
+                $setting.Add("valueJson", "[]")
+            }
+            else
+            {
+                $setting.Add("valueJson", ($settingDefinition.constraints.values[0].value|ConvertTo-Json -Depth 20))
+            }
+        }
+
+
+        $results+=$setting
+
+    }
+    <#
+    foreach ($DSCParam in $DSCParams.Keys)
+    {
+        if ($DSCParam -ne 'Verbose')
+        {
+            $setting=@{}
+            switch (($DSCParams.$DSCParam.gettype()).name) {
+                "String" {$settingType="#microsoft.graph.deviceManagementStringSettingInstance"}
+                "Boolean" {$settingType="#microsoft.graph.deviceManagementBooleanSettingInstance"}
+                "Int32" {$settingType="#microsoft.graph.deviceManagementIntegerSettingInstance"}
+                "String[]" {$settingType="#microsoft.graph.deviceManagementCollectionSettingInstance"}
+                Default {$settingType="#microsoft.graph.deviceManagementComplexSettingInstance"}
+            }
+            $settingDefinitionId =$settingDefinitionIdPrefix + $DSCParam
+            $setting.Add("@odata.type",$settingType)
+            $setting.Add("definitionId", $settingDefinitionId)
+            if("String[]" -eq ($DSCParams.$DSCParam.gettype()).name -and $DSCParams.$DSCParam.count -eq 0 )
+            {
+                $setting.Add("valueJson", "[]")
+            }
+            else
+            {
+                $setting.Add("valueJson", ($DSCParams.$DSCParam|ConvertTo-Json -Depth 20))
+            }
+
+            $results+=$setting
+        }
+    }#>
+    return $results
+}
 function Format-M365DSCIntuneSettingCatalogPolicySettings
 {
     [CmdletBinding()]
@@ -1017,7 +1514,12 @@ function Format-M365DSCIntuneSettingCatalogPolicySettings
     param(
         [Parameter(Mandatory = 'true')]
         [System.Collections.Hashtable]
-        $DSCParams
+        $DSCParams,
+
+        [Parameter()]
+        [ValidateSet("mdm,microsoftSense","configManager")]
+        [System.String]
+        $Technologies
     )
 
     $DSCParams.Remove('Identity') | Out-Null
@@ -1025,138 +1527,278 @@ function Format-M365DSCIntuneSettingCatalogPolicySettings
     $DSCParams.Remove('Description') | Out-Null
 
     #Prepare setting definitions mapping
-    $settingDefinitions=@(
-        @{
-            settingName='AttackSurfaceReductionOnlyExclusions'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductiononlyexclusions'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
-            settingInstanceTemplateId='9b3bc064-2726-4abf-8c70-b9cb440c2422'
-            settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+    switch ($Technologies) {
+        "mdm,microsoftSense"
+        {
+            $settingDefinitions=@(
+                @{
+                    settingName='AttackSurfaceReductionOnlyExclusions'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductiononlyexclusions'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
+                    settingInstanceTemplateId='0eaea6bb-736e-44ed-a450-b2ef5bea1377'
+                    settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+                }
+                @{
+                    settingName='EnableControlledFolderAccess'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_enablecontrolledfolderaccess'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    settingInstanceTemplateId='78c83b32-56c0-445a-932a-872d69af6e49'
+                    settingValueTemplateId='e57db701-c3c6-4264-ab50-7896cb90dfd6'
+                }
+                @{
+                    settingName='ControlledFolderAccessAllowedApplications'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_controlledfolderaccessallowedapplications'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
+                    settingInstanceTemplateId='e10f2cf5-121a-4890-af23-d4e91e0fab5f'
+                    settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+                }
+                @{
+                    settingName='ControlledFolderAccessProtectedFolders'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_controlledfolderaccessprotectedfolders'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
+                    settingInstanceTemplateId='8f2096a7-d4f0-430c-9287-b08db7139163'
+                    settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+                }
+                @{
+                    settingName='AttackSurfaceReductionRules'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationGroupSettingCollectionInstance'
+                    settingInstanceTemplateId='19600663-e264-4c02-8f55-f2983216d6d7'
+                }
+                @{
+                    settingName='BlockAdobeReaderFromCreatingChildProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockadobereaderfromcreatingchildprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockExecutionOfPotentiallyObfuscatedScripts'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutionofpotentiallyobfuscatedscripts'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockWin32APICallsFromOfficeMacros'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockwin32apicallsfromofficemacros'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockcredentialstealingfromwindowslocalsecurityauthoritysubsystem'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablefilesrunningunlesstheymeetprevalenceagetrustedlistcriterion'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockjavascriptorvbscriptfromlaunchingdownloadedexecutablecontent'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockOfficeCommunicationAppFromCreatingChildProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficecommunicationappfromcreatingchildprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockAllOfficeApplicationsFromCreatingChildProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockallofficeapplicationsfromcreatingchildprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockUntrustedUnsignedProcessesThatRunFromUSB'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockuntrustedunsignedprocessesthatrunfromusb'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockProcessCreationsFromPSExecAndWMICommands'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockprocesscreationsfrompsexecandwmicommands'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockPersistenceThroughWMIEventSubscription'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockpersistencethroughwmieventsubscription'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockOfficeApplicationsFromCreatingExecutableContent'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfromcreatingexecutablecontent'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfrominjectingcodeintootherprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='UseAdvancedProtectionAgainstRansomware'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_useadvancedprotectionagainstransomware'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockExecutableContentFromEmailClientAndWebmail'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablecontentfromemailclientandwebmail'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockAbuseOfExploitedVulnerableSignedDrivers'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockabuseofexploitedvulnerablesigneddrivers'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+            )
         }
-        @{
-            settingName='EnableControlledFolderAccess'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_enablecontrolledfolderaccess'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            settingInstanceTemplateId='88286be0-5a51-4238-bcf9-e8db1c3f0023'
-            settingValueTemplateId='93eb92ec-85b7-49fa-87df-09ccc59e390f'
+        "configManager"
+        {
+            $settingDefinitions=@(
+                @{
+                    settingName='AttackSurfaceReductionOnlyExclusions'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductiononlyexclusions'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
+                    settingInstanceTemplateId='9b3bc064-2726-4abf-8c70-b9cb440c2422'
+                    settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+                }
+                @{
+                    settingName='EnableControlledFolderAccess'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_enablecontrolledfolderaccess'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    settingInstanceTemplateId='88286be0-5a51-4238-bcf9-e8db1c3f0023'
+                    settingValueTemplateId='93eb92ec-85b7-49fa-87df-09ccc59e390f'
+                }
+                @{
+                    settingName='ControlledFolderAccessAllowedApplications'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_controlledfolderaccessallowedapplications'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
+                    settingInstanceTemplateId='7b7d300f-40cd-4708-a602-479e41b69647'
+                    settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+                }
+                @{
+                    settingName='ControlledFolderAccessProtectedFolders'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_controlledfolderaccessprotectedfolders'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
+                    settingInstanceTemplateId='081cae44-3f9b-46b1-8eea-f9eb2e1e3031'
+                    settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
+                }
+                @{
+                    settingName='AttackSurfaceReductionRules'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationGroupSettingCollectionInstance'
+                    settingInstanceTemplateId='d770fcd1-62cd-4217-9b20-9ee2a12062ff'
+                }
+                @{
+                    settingName='BlockAdobeReaderFromCreatingChildProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockadobereaderfromcreatingchildprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockExecutionOfPotentiallyObfuscatedScripts'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutionofpotentiallyobfuscatedscripts'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockWin32APICallsFromOfficeMacros'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockwin32apicallsfromofficemacros'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockcredentialstealingfromwindowslocalsecurityauthoritysubsystem'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablefilesrunningunlesstheymeetprevalenceagetrustedlistcriterion'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockjavascriptorvbscriptfromlaunchingdownloadedexecutablecontent'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockOfficeCommunicationAppFromCreatingChildProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficecommunicationappfromcreatingchildprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockAllOfficeApplicationsFromCreatingChildProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockallofficeapplicationsfromcreatingchildprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockUntrustedUnsignedProcessesThatRunFromUSB'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockuntrustedunsignedprocessesthatrunfromusb'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockProcessCreationsFromPSExecAndWMICommands'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockprocesscreationsfrompsexecandwmicommands'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockPersistenceThroughWMIEventSubscription'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockpersistencethroughwmieventsubscription'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockOfficeApplicationsFromCreatingExecutableContent'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfromcreatingexecutablecontent'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfrominjectingcodeintootherprocesses'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='UseAdvancedProtectionAgainstRansomware'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_useadvancedprotectionagainstransomware'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockExecutableContentFromEmailClientAndWebmail'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablecontentfromemailclientandwebmail'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+                @{
+                    settingName='BlockAbuseOfExploitedVulnerableSignedDrivers'
+                    settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockabuseofexploitedvulnerablesigneddrivers'
+                    settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
+                    groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
+                }
+            )
         }
-        @{
-            settingName='ControlledFolderAccessAllowedApplications'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_controlledfolderaccessallowedapplications'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
-            settingInstanceTemplateId='7b7d300f-40cd-4708-a602-479e41b69647'
-            settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
-        }
-        @{
-            settingName='ControlledFolderAccessProtectedFolders'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_controlledfolderaccessprotectedfolders'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance'
-            settingInstanceTemplateId='081cae44-3f9b-46b1-8eea-f9eb2e1e3031'
-            settingValueType='#microsoft.graph.deviceManagementConfigurationStringSettingValue'
-        }
-        @{
-            settingName='AttackSurfaceReductionRules'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationGroupSettingCollectionInstance'
-            settingInstanceTemplateId='d770fcd1-62cd-4217-9b20-9ee2a12062ff'
-        }
-        @{
-            settingName='BlockAdobeReaderFromCreatingChildProcesses'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockadobereaderfromcreatingchildprocesses'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockExecutionOfPotentiallyObfuscatedScripts'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutionofpotentiallyobfuscatedscripts'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockWin32APICallsFromOfficeMacros'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockwin32apicallsfromofficemacros'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockcredentialstealingfromwindowslocalsecurityauthoritysubsystem'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablefilesrunningunlesstheymeetprevalenceagetrustedlistcriterion'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockjavascriptorvbscriptfromlaunchingdownloadedexecutablecontent'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockOfficeCommunicationAppFromCreatingChildProcesses'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficecommunicationappfromcreatingchildprocesses'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockAllOfficeApplicationsFromCreatingChildProcesses'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockallofficeapplicationsfromcreatingchildprocesses'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockUntrustedUnsignedProcessesThatRunFromUSB'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockuntrustedunsignedprocessesthatrunfromusb'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockProcessCreationsFromPSExecAndWMICommands'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockprocesscreationsfrompsexecandwmicommands'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockPersistenceThroughWMIEventSubscription'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockpersistencethroughwmieventsubscription'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockOfficeApplicationsFromCreatingExecutableContent'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfromcreatingexecutablecontent'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfrominjectingcodeintootherprocesses'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='UseAdvancedProtectionAgainstRansomware'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_useadvancedprotectionagainstransomware'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockExecutableContentFromEmailClientAndWebmail'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablecontentfromemailclientandwebmail'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-        @{
-            settingName='BlockAbuseOfExploitedVulnerableSignedDrivers'
-            settingDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockabuseofexploitedvulnerablesigneddrivers'
-            settingDefinitionType='#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance'
-            groupSettingCollectionDefinitionId='device_vendor_msft_policy_config_defender_attacksurfacereductionrules'
-        }
-    )
+    }
 
     #write-verbose -Message ( $DSCParams|out-string)
     $settings=@()
@@ -1235,7 +1877,13 @@ function Get-MgDeviceManagementConfigurationPolicy
             ParameterSetName = 'TemplateId'
         )]
         [System.String]
-        $TemplateId
+        $TemplateId,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
+
     )
     try
     {
@@ -1243,7 +1891,7 @@ function Get-MgDeviceManagementConfigurationPolicy
         {
             try
             {
-                $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationPolicies/$Identity"
+                $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository/$Identity"
                 $configurationPolicy=Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop
                 return $configurationPolicy
             }
@@ -1254,9 +1902,16 @@ function Get-MgDeviceManagementConfigurationPolicy
         }
         if(-Not [String]::IsNullOrEmpty($TemplateId))
         {
-            $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationPolicies"
-            [Array]$configurationPolicies=(Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop).value
-            return ($configurationPolicies|Where-Object -FilterScript {$_.templateReference.templateId -eq "$TemplateId" })
+            if($repository -eq "configurationPolicies")
+            {
+                $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository"
+                [Array]$configurationPolicies=(Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop).value
+                return ($configurationPolicies|Where-Object -FilterScript {$_.templateReference.templateId -eq "$TemplateId" })
+            }
+
+            $Uri="https://graph.microsoft.com/beta/deviceManagement/intents?`$filter=templateId eq '$TemplateId'"
+            $intents=Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop
+            return ($intents.value)
         }
     }
     catch
@@ -1305,27 +1960,53 @@ function New-MgDeviceManagementConfigurationPolicy
 
         [Parameter()]
         [System.Array]
-        $Settings
+        $Settings,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="configurationPolicies"
     )
 
-    $templateReference=@{
-        "templateId"=$TemplateReferenceId
+
+
+    $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository"
+    $policy=@{
+        "description"=$Description
     }
 
-    $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationPolicies"
-    $policy=[ordered]@{
-    "name"=$DisplayName
-    "description"=$Description
-    "platforms"=$Platforms
-    "technologies"=$Technologies
-    "templateReference"=$templateReference
-    "settings"=$Settings
+    switch($Repository)
+    {
+        "configurationManagement"
+        {
+            $templateReference=@{
+                "templateId"=$TemplateReferenceId
+            }
+
+            $policy.add("name",$DisplayName)
+            $policy.add("platforms",$Platforms)
+            $policy.add("technologies",$Technologies)
+            $policy.add("templateReference",$templateReference)
+            $policy.add("settings",$Settings)
+        }
+        "intents"
+        {
+            $policy.add("@odata.type","#microsoft.graph.deviceManagementIntent")
+            $policy.add("displayName",$DisplayName)
+            $policy.add('templateId',$TemplateReferenceId)
+            $policy.add("settings",$Settings)
+        }
     }
-    #write-verbose (($policy|ConvertTo-Json -Depth 20))
-    Invoke-MgGraphRequest -Method POST `
+
+    write-verbose (($policy|ConvertTo-Json -Depth 20))
+    $results=Invoke-MgGraphRequest -Method POST `
         -Uri $Uri `
         -ContentType "application/json" `
         -Body ($policy|ConvertTo-Json -Depth 20)
+
+
+
+    return $results
 }
 
 function Update-MgDeviceManagementConfigurationPolicy
@@ -1358,29 +2039,72 @@ function Update-MgDeviceManagementConfigurationPolicy
 
         [Parameter()]
         [System.Array]
-        $Settings
+        $Settings,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
     )
 
-    $templateReference=@{
-        "templateId"=$TemplateReferenceId
+    $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository/$Identity"
+
+    $policy=@{
+        "description"=$Description
     }
 
-    $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationPolicies/$Identity"
-    $policy=[ordered]@{
-    "name"=$DisplayName
-    "description"=$Description
-    "platforms"=$Platforms
-    "technologies"=$Technologies
-    "templateReference"=$templateReference
-    "settings"=$Settings
-    }
+    switch($Repository)
+    {
+        "configurationManagement"
+        {
+            $method="PUT"
+            $templateReference=@{
+                "templateId"=$TemplateReferenceId
+            }
 
+            $policy.add("name",$DisplayName)
+            $policy.add("platforms",$Platforms)
+            $policy.add("technologies",$Technologies)
+            $policy.add("templateReference",$templateReference)
+            $policy.add("settings",$Settings)
+        }
+        "intents"
+        {
+            $method="PATCH"
+            $policy.add("displayName",$DisplayName)
+        }
+    }
     #write-verbose (($policy|ConvertTo-Json -Depth 20))
 
-    Invoke-MgGraphRequest -Method PUT `
+    Invoke-MgGraphRequest -Method $method `
         -Uri $Uri `
         -ContentType "application/json" `
         -Body ($policy|ConvertTo-Json -Depth 20)
+
+    if($Repository -eq "intents")
+    {
+        $currentSettings=Get-MgDeviceManagementConfigurationPolicySetting `
+            -DeviceManagementConfigurationPolicyId $Identity `
+            -Repository $Repository `
+            -ErrorAction Stop
+
+        foreach($setting in $settings)
+        {
+            $mySetting=$currentSettings|Where-Object -FilterScript {$_.definitionId -eq $setting.definitionId}
+            $setting.add("id",$mySetting.Id)
+        }
+
+        $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository/$Identity/updateSettings"
+        $method="POST"
+        $body=@{"settings"=$Settings}
+        write-verbose -message ($body|ConvertTo-Json -Depth 20)
+
+        Invoke-MgGraphRequest -Method $method `
+            -Uri $Uri `
+            -ContentType "application/json" `
+            -Body ($body|ConvertTo-Json -Depth 20)
+
+    }
 }
 
 function Remove-MgDeviceManagementConfigurationPolicy
@@ -1389,10 +2113,15 @@ function Remove-MgDeviceManagementConfigurationPolicy
     param (
         [Parameter(Mandatory = 'true')]
         [System.String]
-        $Identity
+        $Identity,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
     )
 
-    $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationPolicies/$Identity"
+    $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository/$Identity"
 
     Invoke-MgGraphRequest -Method DELETE -Uri $Uri
 }
@@ -1403,20 +2132,40 @@ function Get-MgDeviceManagementConfigurationPolicySetting
     param (
         [Parameter(Mandatory = 'true')]
         [System.String]
-        $DeviceManagementConfigurationPolicyId
+        $DeviceManagementConfigurationPolicyId,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
     )
     try
     {
         $configurationPolicySettings=@()
 
-        $Uri="https://graph.microsoft.com/beta/deviceManagement/configurationPolicies/$DeviceManagementConfigurationPolicyId/settings"
+        $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository/$DeviceManagementConfigurationPolicyId/settings"
         $results=Invoke-MgGraphRequest -Method GET  -Uri $Uri -ErrorAction Stop
-        $configurationPolicySettings+= $results.value.settingInstance
+        if($Repository -eq "ConfigurationPolicies")
+        {
+            $configurationPolicySettings+= $results.value.settingInstance
+        }
+        else
+        {
+            $configurationPolicySettings+= $results.value
+        }
+
         while($results."@odata.nextLink")
         {
             $Uri=$results."@odata.nextLink"
             $results=Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop
-            $configurationPolicySettings+= $results.value.settingInstance
+            if($Repository -eq "ConfigurationPolicies")
+            {
+                $configurationPolicySettings+= $results.value.settingInstance
+            }
+            else
+            {
+                $configurationPolicySettings+= $results.value
+            }
         }
         return $configurationPolicySettings
     }
@@ -1446,13 +2195,18 @@ function Get-MgDeviceManagementConfigurationPolicyAssignments
     param (
         [Parameter(Mandatory = 'true')]
         [System.String]
-        $DeviceManagementConfigurationPolicyId
+        $DeviceManagementConfigurationPolicyId,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
     )
     try
     {
         $configurationPolicyAssignments=@()
 
-        $Uri="https://graph.microsoft.com/beta/deviceManagement/configurationPolicies/$DeviceManagementConfigurationPolicyId/assignments"
+        $Uri="https://graph.microsoft.com/beta/deviceManagement/$repository/$DeviceManagementConfigurationPolicyId/assignments"
         $results=Invoke-MgGraphRequest -Method GET  -Uri $Uri -ErrorAction Stop
         foreach($result in $results.value.target)
         {
@@ -1513,13 +2267,18 @@ function Update-MgDeviceManagementConfigurationPolicyAssignments
 
         [Parameter()]
         [Array]
-        $Targets
+        $Targets,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
     )
     try
     {
         $configurationPolicyAssignments=@()
 
-        $Uri="https://graph.microsoft.com/beta/deviceManagement/configurationPolicies/$DeviceManagementConfigurationPolicyId/assign"
+        $Uri="https://graph.microsoft.com/beta/deviceManagement/$Repository/$DeviceManagementConfigurationPolicyId/assign"
 
         foreach($target in $targets)
         {
@@ -1573,15 +2332,42 @@ function Get-MgDeviceManagementConfigurationSettingDefinition
     [OutputType([System.Collections.Hashtable])]
     param (
 
-        [Parameter(Mandatory = $true)]
+        [Parameter()]
         [System.String]
-        $Identity
+        $settingDefinitionId,
+
+        [Parameter()]
+        [System.String]
+        $templateReferenceId,
+
+        [Parameter()]
+        [ValidateSet("configurationPolicies","intents")]
+        [System.String]
+        $Repository="ConfigurationPolicies"
+
     )
     try
     {
-        $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationSettings/$($Identity.tolower())"
-        $configurationPolicySetting=Invoke-MgGraphRequest -Method GET  -Uri $Uri -ErrorAction Stop
-        return $configurationPolicySetting
+        if(-not [string]::IsNullOrEmpty($settingDefinitionId))
+        {
+            $Uri="https://graph.microsoft.com/beta/deviceManagement/ConfigurationSettings/$($settingDefinitionId.tolower())"
+            $configurationPolicySetting=Invoke-MgGraphRequest -Method GET  -Uri $Uri -ErrorAction Stop
+            return $configurationPolicySetting
+        }
+
+        if(-not [string]::IsNullOrEmpty($templateReferenceId))
+        {
+            if($Repository -eq "intents")
+            {
+                $Uri="https://graph.microsoft.com/beta/deviceManagement/templates/$templateReferenceId/categories"
+                $categoryId=(Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop).value.id
+
+                $Uri="https://graph.microsoft.com/beta/deviceManagement/templates/$templateReferenceId/categories/$categoryId/settingDefinitions"
+                $templateSettings=Invoke-MgGraphRequest -Method GET -Uri $Uri -ErrorAction Stop
+                return $templateSettings.value
+            }
+        }
+
     }
     catch
     {
@@ -2085,4 +2871,4 @@ function Convert-M365DSCDRGComplexTypeToHashtable
     return $results
 }
 
-Export-ModuleMember -Function *-TargetResource
+Export-ModuleMember -Function *-TargetResource,*
