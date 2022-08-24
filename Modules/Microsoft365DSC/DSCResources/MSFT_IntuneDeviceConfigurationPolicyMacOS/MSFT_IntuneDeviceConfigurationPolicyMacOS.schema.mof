@@ -10,11 +10,11 @@ class MSFT_DeviceManagementConfigurationPolicyAssignments
 [ClassVersion("1.0.0")]
 class MSFT_MicrosoftGraphapplistitem
 {
-    [Write, Description(""), ValueMap{"#microsoft.graph.appleAppListItem"}, Values{"#microsoft.graph.appleAppListItem"}] String odataType;
-    [Write, Description("")] String appId;
-    [Write, Description("")] String appStoreUrl;
-    [Write, Description("")] String name;
-    [Write, Description("")] String publisher;
+    [Write, Description("Type of the app list item"), ValueMap{"#microsoft.graph.appleAppListItem"}, Values{"#microsoft.graph.appleAppListItem"}] String odataType;
+    [Write, Description("To see a list of bundle IDs for common built-in iOS apps, see the Intune documentation. Add managed Intune apps from the Software Node.")] String appId;
+    [Write, Description("URL of app for kiosk mode, e.g. https://itunes.apple.com/us/app/work-folders/id950878067?mt=8")] String appStoreUrl;
+    [Write, Description("Name of the app")] String name;
+    [Write, Description("Publisher of the app")] String publisher;
 };
 [ClassVersion("1.0.0")]
 class MSFT_MicrosoftGraphmacosprivacyaccesscontrolitem
