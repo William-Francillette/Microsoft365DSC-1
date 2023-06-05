@@ -8,6 +8,10 @@ function Get-TargetResource
         [System.String]
         $Id,
 
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
+
         [Parameter()]
         [System.String]
         $AccessPackageId,
@@ -23,10 +27,6 @@ function Get-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-
-        [Parameter()]
-        [System.String]
-        $DisplayName,
 
         [Parameter()]
         [System.Int32]
@@ -141,7 +141,11 @@ function Get-TargetResource
                 $setting.add('odataType', $setting.AdditionalProperties.'@odata.type')
                 if (-not [String]::isNullOrEmpty($setting.AdditionalProperties.id))
                 {
-                    $setting.add('Id', $setting.AdditionalProperties.id)
+                    $user = Get-MgUser -UserId $setting.AdditionalProperties.Id -ErrorAction SilentlyContinue
+                    if ($null -ne $user)
+                    {
+                        $setting.add('Id', $user.UserPrincipalName)
+                    }
                 }
                 if (-not [String]::isNullOrEmpty($setting.AdditionalProperties.managerLevel))
                 {
@@ -213,7 +217,11 @@ function Get-TargetResource
                 $setting.add('odataType', $setting.AdditionalProperties.'@odata.type')
                 if (-not [String]::isNullOrEmpty($setting.AdditionalProperties.id))
                 {
-                    $setting.add('Id', $setting.AdditionalProperties.id)
+                    $user = Get-MgUser -UserId $setting.AdditionalProperties.Id -ErrorAction SilentlyContinue
+                    if ($null -ne $user)
+                    {
+                        $setting.add('Id', $user.UserPrincipalName)
+                    }
                 }
                 if (-not [String]::isNullOrEmpty($setting.AdditionalProperties.managerLevel))
                 {
@@ -315,6 +323,10 @@ function Set-TargetResource
         [System.String]
         $Id,
 
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
+
         [Parameter()]
         [System.String]
         $AccessPackageId,
@@ -330,10 +342,6 @@ function Set-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-
-        [Parameter()]
-        [System.String]
-        $DisplayName,
 
         [Parameter()]
         [System.Int32]
@@ -439,6 +447,31 @@ function Set-TargetResource
             }
         }
 
+        # Convert back user principal names to Ids
+        if ($null -ne $CreateParameters.AccessReviewSettings -and $null -ne $CreateParameters.AccessReviewSettings.Reviewers)
+        {
+            for ($i = 0; $i -lt $CreateParameters.AccessReviewSettings.Reviewers.Length; $i++)
+            {
+                $reviewer = $CreateParameters.AccessReviewSettings.Reviewers[$i]
+                $user = Get-MgUser -Filter "startswith(UserPrincipalName, '$($reviewer.Id.Split('@')[0])')" -ErrorAction SilentlyContinue
+                if ($null -ne $user)
+                {
+                    $CreateParameters.AccessReviewSettings.Reviewers[$i].Id = $user.Id
+                }
+            }
+        }
+        if ($null -ne $CreateParameters.RequestorSettings -and $null -ne $CreateParameters.RequestorSettings.AllowedRequestors)
+        {
+            for ($i = 0; $i -lt $CreateParameters.RequestorSettings.AllowedRequestors.Length; $i++)
+            {
+                $requestor = $CreateParameters.RequestorSettings.AllowedRequestors[$i]
+                $user = Get-MgUser -Filter "startswith(UserPrincipalName, '$($requestor.Id.Split('@')[0])')" -ErrorAction SilentlyContinue
+                if ($null -ne $user)
+                {
+                    $CreateParameters.RequestorSettings.AllowedRequestors[$i].Id = $user.Id
+                }
+            }
+        }
         New-MgEntitlementManagementAccessPackageAssignmentPolicy `
             -BodyParameter $CreateParameters
     }
@@ -463,6 +496,34 @@ function Set-TargetResource
             }
         }
 
+        # Convert back user principal names to Ids
+        if ($null -ne $UpdateParameters.AccessReviewSettings -and $null -ne $UpdateParameters.AccessReviewSettings.Reviewers)
+        {
+            Write-Verbose -Message "Updating Reviewers' Id"
+            for ($i = 0; $i -lt $UpdateParameters.AccessReviewSettings.Reviewers.Length; $i++)
+            {
+                $reviewer = $UpdateParameters.AccessReviewSettings.Reviewers[$i]
+                $user = Get-MgUser -Filter "startswith(UserPrincipalName, '$($reviewer.Id.Split('@')[0])')" -ErrorAction SilentlyContinue
+                if ($null -ne $user)
+                {
+                    $UpdateParameters.AccessReviewSettings.Reviewers[$i].Id = $user.Id
+                }
+            }
+        }
+        if ($null -ne $UpdateParameters.RequestorSettings -and $null -ne $UpdateParameters.RequestorSettings.AllowedRequestors)
+        {
+            Write-Verbose -Message "Updating Requestors' Id"
+            for ($i = 0; $i -lt $UpdateParameters.RequestorSettings.AllowedRequestors.Length; $i++)
+            {
+                Write-Verbose -Message "Requestor: $($UpdateParameters.RequestorSettings.AllowedRequestors[$i].Id)"
+                $requestor = $UpdateParameters.RequestorSettings.AllowedRequestors[$i]
+                $user = Get-MgUser -Filter "startswith(UserPrincipalName, '$($requestor.Id.Split('@')[0])')" -ErrorAction SilentlyContinue
+                if ($null -ne $user)
+                {
+                    $UpdateParameters.RequestorSettings.AllowedRequestors[$i].Id = $user.Id
+                }
+            }
+        }
         Set-MgEntitlementManagementAccessPackageAssignmentPolicy `
             -BodyParameter $UpdateParameters `
             -AccessPackageAssignmentPolicyId $currentInstance.Id
@@ -484,6 +545,10 @@ function Test-TargetResource
         [System.String]
         $Id,
 
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
+
         [Parameter()]
         [System.String]
         $AccessPackageId,
@@ -499,10 +564,6 @@ function Test-TargetResource
         [Parameter()]
         [System.String]
         $Description,
-
-        [Parameter()]
-        [System.String]
-        $DisplayName,
 
         [Parameter()]
         [System.Int32]
@@ -701,6 +762,7 @@ function Export-TargetResource
             Write-Host "    |---[$i/$($getValue.Count)] $displayedKey" -NoNewline
             $params = @{
                 id                    = $config.id
+                DisplayName           = $config.displayName
                 Ensure                = 'Present'
                 Credential            = $Credential
                 ApplicationId         = $ApplicationId
@@ -862,6 +924,7 @@ function Export-TargetResource
             if ($null -ne $Results.AccessReviewSettings)
             {
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'AccessReviewSettings'
+                $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName 'Reviewers'
             }
             if ($null -ne $Results.Questions )
             {
@@ -890,13 +953,20 @@ function Export-TargetResource
     }
     catch
     {
-        Write-Host $Global:M365DSCEmojiRedX
+        if ($_.ErrorDetails.Message -like '*User is not authorized to perform the operation.*')
+        {
+            Write-Host "`r`n    $($Global:M365DSCEmojiYellowCircle) Tenant does not meet license requirement to extract this component."
+        }
+        else
+        {
+            Write-Host $Global:M365DSCEmojiRedX
 
-        New-M365DSCLogEntry -Message 'Error retrieving data:' `
-            -Exception $_ `
-            -Source $($MyInvocation.MyCommand.Source) `
-            -TenantId $TenantId `
-            -Credential $Credential
+            New-M365DSCLogEntry -Message 'Error during Export:' `
+                -Exception $_ `
+                -Source $($MyInvocation.MyCommand.Source) `
+                -TenantId $TenantId `
+                -Credential $Credential
+        }
 
         return ''
     }
@@ -1155,9 +1225,21 @@ function Get-M365DSCDRGComplexTypeToString
         if ($null -ne $ComplexObject.$key)
         {
             $keyNotNull++
-            if ($ComplexObject.$key.GetType().FullName -like 'Microsoft.Graph.PowerShell.Models.*' -or $key -in $ComplexTypeMapping.Name)
+            if ($ComplexObject.$key.GetType().FullName -like 'Microsoft.Graph.PowerShell.Models.*' -or $key -in $ComplexTypeMapping.Name `
+                -or ($null -ne $ComplexObject.$key.odatatype -and $ComplexObject.$key.odataType -eq '#microsoft.graph.singleUser'))
             {
-                $hashPropertyType = $ComplexObject[$key].GetType().Name.tolower()
+                if ($null -ne $ComplexObject.$key.odatatype -and $ComplexObject.$key.odataType -eq '#microsoft.graph.singleUser')
+                {
+                    $hashPropertyType = 'MSFT_MicrosoftGraphuserset'
+                    $ComplexTypeMapping = @{
+                        Name            = $key
+                        CIMInstanceName = 'MSFT_MicrosoftGraphuserset'
+                    }
+                }
+                else
+                {
+                    $hashPropertyType = $ComplexObject[$key].GetType().Name.tolower()
+                }
 
                 $isArray = $false
                 if ($ComplexObject[$key].GetType().FullName -like '*[[\]]')

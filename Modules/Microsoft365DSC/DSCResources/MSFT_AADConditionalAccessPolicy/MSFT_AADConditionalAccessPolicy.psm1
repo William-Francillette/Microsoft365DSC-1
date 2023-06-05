@@ -6,11 +6,11 @@ function Get-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $DisplayName,
-
-        [Parameter()]
-        [System.String]
         $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
 
         [Parameter()]
         [System.String]
@@ -101,17 +101,6 @@ function Get-TargetResource
         [System.String[]]
         $ExcludeLocations,
 
-        #ConditionalAccessDevicesCondition
-        #DEPRECATED
-        [Parameter()]
-        [System.String[]]
-        $IncludeDevices,
-
-        #DEPRECATED
-        [Parameter()]
-        [System.String[]]
-        $ExcludeDevices,
-
         [Parameter()]
         [ValidateSet('include', 'exclude')]
         [System.String]
@@ -186,6 +175,10 @@ function Get-TargetResource
         [Parameter()]
         [System.String[]]
         $CustomAuthenticationFactors,
+
+        [Parameter()]
+        [System.String]
+        $AuthenticationStrength,
 
         #generic
         [Parameter()]
@@ -503,9 +496,9 @@ function Get-TargetResource
                     {
                         $ExcludeLocations += $ExcludeLocationGUID
                     }
-                    elseif ($IncludeLocationGUID -eq '00000000-0000-0000-0000-000000000000')
+                    elseif ($ExcludeLocationGUID -eq '00000000-0000-0000-0000-000000000000')
                     {
-                        $IncludeLocations += 'Multifactor authentication trusted IPs'
+                        $ExcludeLocations += 'Multifactor authentication trusted IPs'
                     }
                     elseif ($null -eq $Locationlookup[$ExcludeLocationGUID])
                     {
@@ -565,6 +558,17 @@ function Get-TargetResource
             }
         }
 
+        $AuthenticationStrengthValue = $null
+        if ($null -ne $Policy.GrantControls -and $null -ne $Policy.GrantControls.AuthenticationStrength -and `
+            $null -ne $Policy.GrantControls.AuthenticationStrength.Id)
+        {
+            $strengthPolicy = Get-MgPolicyAuthenticationStrengthPolicy -AuthenticationStrengthPolicyId $Policy.GrantControls.AuthenticationStrength.Id
+            if ($null -ne $strengthPolicy)
+            {
+                $AuthenticationStrengthValue = $strengthPolicy.DisplayName
+            }
+        }
+
         $result = @{
             DisplayName                              = $Policy.DisplayName
             Id                                       = $Policy.Id
@@ -595,9 +599,6 @@ function Get-TargetResource
             #no translation needed, return empty string array if undefined
             IncludeLocations                         = $IncludeLocations
             ExcludeLocations                         = $ExcludeLocations
-
-            IncludeDevices                           = [System.String[]](@() + $Policy.Conditions.Devices.IncludeDevices)
-            ExcludeDevices                           = [System.String[]](@() + $Policy.Conditions.Devices.ExcludeDevices)
 
             #no translation needed, return empty string array if undefined
             DeviceFilterMode                         = [System.String]$Policy.Conditions.Devices.DeviceFilter.Mode
@@ -631,6 +632,7 @@ function Get-TargetResource
             #make false if undefined, true if true
             PersistentBrowserMode                    = [System.String]$Policy.SessionControls.PersistentBrowser.Mode
             #no translation needed
+            AuthenticationStrength                   = $AuthenticationStrengthValue
             #Standard part
             TermsOfUse                               = $termOfUseName
             Ensure                                   = 'Present'
@@ -653,11 +655,11 @@ function Set-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $DisplayName,
-
-        [Parameter()]
-        [System.String]
         $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
 
         [Parameter()]
         [System.String]
@@ -748,17 +750,6 @@ function Set-TargetResource
         [System.String[]]
         $ExcludeLocations,
 
-        #ConditionalAccessDevicesCondition
-        #DEPRECATED
-        [Parameter()]
-        [System.String[]]
-        $IncludeDevices,
-
-        #DEPRECATED
-        [Parameter()]
-        [System.String[]]
-        $ExcludeDevices,
-
         [Parameter()]
         [ValidateSet('include', 'exclude')]
         [System.String]
@@ -833,6 +824,10 @@ function Set-TargetResource
         [Parameter()]
         [System.String[]]
         $CustomAuthenticationFactors,
+
+        [Parameter()]
+        [System.String]
+        $AuthenticationStrength,
 
         #generic
         [Parameter()]
@@ -1150,55 +1145,51 @@ function Set-TargetResource
             }
         }
         Write-Verbose -Message 'Set-Targetresource: process includeGuestsOrExternalUsers'
-        $includeGuestsOrExternalUsers = @{}
-        [string]$IncludeGuestOrExternalUserTypes = $IncludeGuestOrExternalUserTypes -join ','
-        $includeGuestsOrExternalUsers.Add('guestOrExternalUserTypes', $IncludeGuestOrExternalUserTypes)
-        $externalTenants = @{}
-        if ($IncludeExternalTenantsMembershipKind -eq 'All')
+        if ($IncludeGuestOrExternalUserTypes.Count -ne 0)
         {
-            $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessAllExternalTenants')
+            $includeGuestsOrExternalUsers = @{}
+            [string]$IncludeGuestOrExternalUserTypes = $IncludeGuestOrExternalUserTypes -join ','
+            $includeGuestsOrExternalUsers.Add('guestOrExternalUserTypes', $IncludeGuestOrExternalUserTypes)
+            $externalTenants = @{}
+            if ($IncludeExternalTenantsMembershipKind -eq 'All')
+            {
+                $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessAllExternalTenants')
+            }
+            elseif ($IncludeExternalTenantsMembershipKind -eq 'enumerated')
+            {
+                $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessEnumeratedExternalTenants')
+            }
+            $externalTenants.Add('membershipKind', $IncludeExternalTenantsMembershipKind)
+            if ($IncludeExternalTenantsMembers)
+            {
+                $externalTenants.Add('members', $IncludeExternalTenantsMembers)
+            }
+            $includeGuestsOrExternalUsers.Add('externalTenants', $externalTenants)
+            $conditions.Users.Add('includeGuestsOrExternalUsers', $includeGuestsOrExternalUsers)
         }
-        elseif ($IncludeExternalTenantsMembershipKind -eq 'enumerated')
-        {
-            $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessEnumeratedExternalTenants')
-        }
-        else
-        {
-            $externalTenants.Add('@odata.type', '')
-        }
-        $externalTenants.Add('membershipKind', $IncludeExternalTenantsMembershipKind)
-        if ($IncludeExternalTenantsMembers)
-        {
-            $externalTenants.Add('members', $IncludeExternalTenantsMembers)
-        }
-        $includeGuestsOrExternalUsers.Add('externalTenants', $externalTenants)
-        $conditions.Users.Add('includeGuestsOrExternalUsers', $includeGuestsOrExternalUsers)
-
         Write-Verbose -Message 'Set-Targetresource: process excludeGuestsOrExternalUsers'
-        $excludeGuestsOrExternalUsers = @{}
-        [string]$ExcludeGuestOrExternalUserTypes = $ExcludeGuestOrExternalUserTypes -join ','
-        $excludeGuestsOrExternalUsers.Add('guestOrExternalUserTypes', $ExcludeGuestOrExternalUserTypes)
-        $externalTenants = @{}
-        if ($ExcludeExternalTenantsMembershipKind -eq 'All')
+        if ($ExcludeGuestOrExternalUserTypes.Count -ne 0)
         {
-            $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessAllExternalTenants')
+            $excludeGuestsOrExternalUsers = @{}
+            [string]$ExcludeGuestOrExternalUserTypes = $ExcludeGuestOrExternalUserTypes -join ','
+            $excludeGuestsOrExternalUsers.Add('guestOrExternalUserTypes', $ExcludeGuestOrExternalUserTypes)
+            $externalTenants = @{}
+            if ($ExcludeExternalTenantsMembershipKind -eq 'All')
+            {
+                $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessAllExternalTenants')
+            }
+            elseif ($ExcludeExternalTenantsMembershipKind -eq 'enumerated')
+            {
+                $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessEnumeratedExternalTenants')
+            }
+            $externalTenants.Add('membershipKind', $ExcludeExternalTenantsMembershipKind)
+            if ($ExcludeExternalTenantsMembers)
+            {
+                $externalTenants.Add('members', $ExcludeExternalTenantsMembers)
+            }
+            $excludeGuestsOrExternalUsers.Add('externalTenants', $externalTenants)
+            $conditions.Users.Add('excludeGuestsOrExternalUsers', $excludeGuestsOrExternalUsers)
         }
-        elseif ($ExcludeExternalTenantsMembershipKind -eq 'enumerated')
-        {
-            $externalTenants.Add('@odata.type', '#microsoft.graph.conditionalAccessEnumeratedExternalTenants')
-        }
-        else
-        {
-            $externalTenants.Add('@odata.type', '')
-        }
-        $externalTenants.Add('membershipKind', $ExcludeExternalTenantsMembershipKind)
-        if ($ExcludeExternalTenantsMembers)
-        {
-            $externalTenants.Add('members', $ExcludeExternalTenantsMembers)
-        }
-        $excludeGuestsOrExternalUsers.Add('externalTenants', $externalTenants)
-        $conditions.Users.Add('excludeGuestsOrExternalUsers', $excludeGuestsOrExternalUsers)
-
         Write-Verbose -Message 'Set-Targetresource: process platform condition'
         if ($IncludePlatforms -or $ExcludePlatforms)
         {
@@ -1304,12 +1295,6 @@ function Set-TargetResource
             }
         }
 
-        #DEPRECATED
-        if ($IncludeDevices -or $ExcludeDevices)
-        {
-            Write-Verbose -Message 'IncludeDevices and ExcludeDevices parameters are deprecated. These settings will not be applied. Instead, use the DeviceFilterMode and DeviceFilterRule parameters.'
-        }
-
         Write-Verbose -Message 'Set-Targetresource: process device filter'
         if ($DeviceFilterMode -and $DeviceFilterRule)
         {
@@ -1366,7 +1351,7 @@ function Set-TargetResource
         #create and provision Grant Control object
         Write-Verbose -Message 'Set-Targetresource: create and provision Grant Control object'
 
-        if ($GrantControlOperator -and ($BuiltInControls -or $TermsOfUse -or $CustomAuthenticationFactors))
+        if ($GrantControlOperator -and ($BuiltInControls -or $TermsOfUse -or $CustomAuthenticationFactors -or $AuthenticationStrength))
         {
             $GrantControls = @{
                 Operator = $GrantControlOperator
@@ -1379,6 +1364,18 @@ function Set-TargetResource
             if ($customAuthenticationFactors)
             {
                 $GrantControls.Add('customAuthenticationFactors', $CustomAuthenticationFactors)
+            }
+            if ($AuthenticationStrength)
+            {
+                $strengthPolicy = Get-MgPolicyAuthenticationStrengthPolicy | Where-Object -FilterScript {$_.DisplayName -eq $AuthenticationStrength} -ErrorAction SilentlyContinue
+                if ($null -ne $strengthPolicy)
+                {
+                    $authenticationStrengthInstance = @{
+                        id            = $strengthPolicy.Id
+                        "@odata.type" = "#microsoft.graph.authenticationStrengthPolicy"
+                    }
+                    $GrantControls.Add('authenticationStrength', $authenticationStrengthInstance)
+                }
             }
 
             if ($TermsOfUse)
@@ -1521,11 +1518,11 @@ function Test-TargetResource
     (
         [Parameter(Mandatory = $true)]
         [System.String]
-        $DisplayName,
-
-        [Parameter()]
-        [System.String]
         $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $DisplayName,
 
         [Parameter()]
         [System.String]
@@ -1616,17 +1613,6 @@ function Test-TargetResource
         [System.String[]]
         $ExcludeLocations,
 
-        #ConditionalAccessDevicesCondition
-        #DEPRECATED
-        [Parameter()]
-        [System.String[]]
-        $IncludeDevices,
-
-        #DEPRECATED
-        [Parameter()]
-        [System.String[]]
-        $ExcludeDevices,
-
         [Parameter()]
         [ValidateSet('include', 'exclude')]
         [System.String]
@@ -1701,6 +1687,10 @@ function Test-TargetResource
         [Parameter()]
         [System.String[]]
         $CustomAuthenticationFactors,
+
+        [Parameter()]
+        [System.String]
+        $AuthenticationStrength,
 
         #generic
         [Parameter()]
@@ -1834,19 +1824,6 @@ function Export-TargetResource
                     Managedidentity       = $ManagedIdentity.IsPresent
                 }
                 $Results = Get-TargetResource @Params
-
-                #DEPRECATED
-                if ($Results.IncludeDevices)
-                {
-                    Write-Host "`r`n    $($Global:M365DSCEmojiYellowCircle) The Include Devices parameter is deprecated. Instead use the Device Filter Mode and Device Filter Rule parameters in the portal."
-                    $Results.Remove('IncludeDevices') | Out-Null
-                }
-                #DEPRECATED
-                if ($Results.ExcludeDevices)
-                {
-                    Write-Host "`r`n    $($Global:M365DSCEmojiYellowCircle) The Exclude Devices parameter is deprecated. Instead use the Device Filter Mode and Device Filter Rule parameters in the portal."
-                    $Results.Remove('ExcludeDevices') | Out-Null
-                }
 
                 if ([System.String]::IsNullOrEmpty($Results.DeviceFilterMode))
                 {

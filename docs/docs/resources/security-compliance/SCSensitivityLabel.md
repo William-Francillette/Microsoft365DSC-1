@@ -13,29 +13,24 @@
 | **ParentId** | Write | String | The ParentId parameter specifies the parent label that you want this label to be under (a sublabel). You can use any value that uniquely identifies the parent sensitivity label for example name. | |
 | **Priority** | Write | UInt32 | The Priority parameter specifies a priority value for the sensitivity label that determines the order of label processing. A lower integer value indicates a highter priority. | |
 | **Tooltip** | Write | String | The ToolTip parameter specifies the default tooltip and sensitivity label description that's seen by users. It the value contains spaces, enclose the value in quotation marks. | |
-| **Disabled** | Write | Boolean | The disabled parameter specifies whether to enable or disable the sensitivity label. | |
 | **ApplyContentMarkingFooterAlignment** | Write | String | The ApplyContentMarkingFooterAlignment parameter specifies the footer alignment. | `Left`, `Center`, `Right` |
 | **ApplyContentMarkingFooterEnabled** | Write | Boolean | The ApplyContentMarkingFooterEnabled parameter specifies whether to enable or disable the sensitivity label. | |
 | **ApplyContentMarkingFooterFontColor** | Write | String | The ApplyContentMarkingFooterFontColor parameter specifies the color of the footer text. This parameter accepts a hexadecimal color code value in the format #xxxxxx. The default value is #000000. | |
-| **ApplyContentMarkingFooterFontName** | Write | String | DEPRECATED | |
 | **ApplyContentMarkingFooterFontSize** | Write | SInt32 | The ApplyContentMarkingFooterFontSize parameter specifies the font size (in points) of the footer text. | |
 | **ApplyContentMarkingFooterMargin** | Write | SInt32 | The ApplyContentMarkingFooterMargin parameter specifies the size (in points) of the footer margin. | |
 | **ApplyContentMarkingFooterText** | Write | String | The ApplyContentMarkingFooterText parameter specifies the footer text. If the value contains spaces, enclose the value in quotation marks. | |
 | **ApplyContentMarkingHeaderAlignment** | Write | String | The ApplyContentMarkingHeaderAlignment parameter specifies the header alignment. | `Left`, `Center`, `Right` |
 | **ApplyContentMarkingHeaderEnabled** | Write | Boolean | The ApplyContentMarkingHeaderEnabled parameter enables or disables the Apply Content Marking Header action for the label. | |
 | **ApplyContentMarkingHeaderFontColor** | Write | String | The ApplyContentMarkingHeaderFontColor parameter specifies the color of the header text. This parameter accepts a hexadecimal color code value in the format #xxxxxx. The default value is #000000. | |
-| **ApplyContentMarkingHeaderFontName** | Write | String | DEPRECATED | |
 | **ApplyContentMarkingHeaderFontSize** | Write | SInt32 | The ApplyContentMarkingHeaderFontSize parameter specifies the font size (in points) of the header text. | |
 | **ApplyContentMarkingHeaderMargin** | Write | SInt32 | The ApplyContentMarkingHeaderMargin parameter specifies the size (in points) of the header margin. | |
 | **ApplyContentMarkingHeaderText** | Write | String | The ApplyContentMarkingHeaderText parameter specifies the header text. If the value contains spaces, enclose the value in quotation marks. | |
 | **ApplyWaterMarkingEnabled** | Write | Boolean | The ApplyWaterMarkingEnabled parameter enables or disables the Apply Watermarking Header action for the label. | |
 | **ApplyWaterMarkingFontColor** | Write | String | The ApplyWaterMarkingFontColor parameter specifies the color of the watermark text. This parameter accepts a hexadecimal color code value in the format #xxxxxx. | |
-| **ApplyWaterMarkingFontName** | Write | String | DEPRECATED | |
 | **ApplyWaterMarkingFontSize** | Write | SInt32 | The ApplyWaterMarkingFontSize parameter specifies the font size (in points) of the watermark text. | |
 | **ApplyWaterMarkingLayout** | Write | String | The ApplyWaterMarkingAlignment parameter specifies the watermark alignment. | `Horizontal`, `Diagonal` |
 | **ApplyWaterMarkingText** | Write | String | The ApplyWaterMarkingText parameter specifies the watermark text. If the value contains spaces, enclose the value in quotation marks. | |
 | **ContentType** | Write | StringArray[] | The ContentType parameter specifies where the sensitivity label can be applied. | `File, Email`, `Site, UnifiedGroup`, `PurviewAssets`, `Teamwork`, `SchematizedData` |
-| **EncryptionAipTemplateScopes** | Write | String | DEPRECATED | |
 | **EncryptionContentExpiredOnDateInDaysOrNever** | Write | String | The EncryptionContentExpiredOnDateInDaysOrNever parameter specifies when the encrypted content expires. Valid values are integer or never. | |
 | **EncryptionDoNotForward** | Write | Boolean | The EncryptionDoNotForward parameter specifies whether the Do Not Forward template is applied. | |
 | **EncryptionEncryptOnly** | Write | Boolean | The EncryptionEncryptOnly parameter specifies whether the encrypt-only template is applied. | |
@@ -129,67 +124,64 @@ Configuration Example
     {
         SCSensitivityLabel 'ConfigureSensitivityLabel'
         {
-            Name                                           = "DemoLabel"
-            Comment                                        = "Demo Label comment"
-            ToolTip                                        = "Demo tool tip"
-            DisplayName                                    = "Demo Label"
-            ApplyContentMarkingFooterAlignment             = "Center"
+            Name                                           = 'DemoLabel'
+            Comment                                        = 'Demo Label comment'
+            ToolTip                                        = 'Demo tool tip'
+            DisplayName                                    = 'Demo Label'
+            ApplyContentMarkingFooterAlignment             = 'Center'
             ApplyContentMarkingFooterEnabled               = $true
-            ApplyContentMarkingFooterFontColor             = "#FF0000"
-            ApplyContentMarkingFooterFontName              = "calibri"
+            ApplyContentMarkingFooterFontColor             = '#FF0000'
             ApplyContentMarkingFooterFontSize              = 10
             ApplyContentMarkingFooterMargin                = 5
-            ApplyContentMarkingFooterText                  = "Demo footer text"
-            ApplyContentMarkingHeaderAlignment             = "Center"
+            ApplyContentMarkingFooterText                  = 'Demo footer text'
+            ApplyContentMarkingHeaderAlignment             = 'Center'
             ApplyContentMarkingHeaderEnabled               = $true
-            ApplyContentMarkingHeaderFontColor             = "#FF0000"
-            ApplyContentMarkingHeaderFontName              = "calibri"
+            ApplyContentMarkingHeaderFontColor             = '#FF0000'
             ApplyContentMarkingHeaderFontSize              = 10
             ApplyContentMarkingHeaderMargin                = 5
-            ApplyContentMarkingHeaderText                  = "demo header text"
+            ApplyContentMarkingHeaderText                  = 'demo header text'
             ApplyWaterMarkingEnabled                       = $true
-            ApplyWaterMarkingFontColor                     = "#FF0000"
-            ApplyWaterMarkingFontName                      = "calibri"
+            ApplyWaterMarkingFontColor                     = '#FF0000'
             ApplyWaterMarkingFontSize                      = 10
-            ApplyWaterMarkingLayout                        = "Diagonal"
-            ApplyWaterMarkingText                          = "demo watermark"
+            ApplyWaterMarkingLayout                        = 'Diagonal'
+            ApplyWaterMarkingText                          = 'demo watermark'
             SiteAndGroupProtectionAllowAccessToGuestUsers  = $true
             SiteAndGroupProtectionAllowEmailFromGuestUsers = $true
             SiteAndGroupProtectionAllowFullAccess          = $true
             SiteAndGroupProtectionAllowLimitedAccess       = $true
             SiteAndGroupProtectionBlockAccess              = $true
             SiteAndGroupProtectionEnabled                  = $true
-            SiteAndGroupProtectionPrivacy                  = "Private"
+            SiteAndGroupProtectionPrivacy                  = 'Private'
             LocaleSettings                                 = @(
                 MSFT_SCLabelLocaleSettings
                 {
-                    LocaleKey = "DisplayName"
-                    LabelSettings  = @(
+                    LocaleKey     = 'DisplayName'
+                    LabelSettings = @(
                         MSFT_SCLabelSetting
                         {
-                            Key   = "en-us"
-                            Value = "English Display Names"
+                            Key   = 'en-us'
+                            Value = 'English Display Names'
                         }
                         MSFT_SCLabelSetting
                         {
-                            Key   = "fr-fr"
+                            Key   = 'fr-fr'
                             Value = "Nom da'ffichage francais"
                         }
                     )
                 }
                 MSFT_SCLabelLocaleSettings
                 {
-                    LocaleKey = "StopColor"
-                    LabelSettings  = @(
+                    LocaleKey     = 'StopColor'
+                    LabelSettings = @(
                         MSFT_SCLabelSetting
                         {
-                            Key   = "en-us"
-                            Value = "RedGreen"
+                            Key   = 'en-us'
+                            Value = 'RedGreen'
                         }
                         MSFT_SCLabelSetting
                         {
-                            Key   = "fr-fr"
-                            Value = "Rouge"
+                            Key   = 'fr-fr'
+                            Value = 'Rouge'
                         }
                     )
                 }
@@ -197,17 +189,17 @@ Configuration Example
             AdvancedSettings                               = @(
                 MSFT_SCLabelSetting
                 {
-                    Key   = "AllowedLevel"
-                    Value = @("Sensitive", "Classified")
+                    Key   = 'AllowedLevel'
+                    Value = @('Sensitive', 'Classified')
                 }
                 MSFT_SCLabelSetting
                 {
-                    Key   = "LabelStatus"
-                    Value = "Enabled"
+                    Key   = 'LabelStatus'
+                    Value = 'Enabled'
                 }
             )
-            ParentId                                       = "Personal"
-            Ensure                                         = "Present"
+            ParentId                                       = 'Personal'
+            Ensure                                         = 'Present'
             Credential                                     = $credsGlobalAdmin
         }
     }
