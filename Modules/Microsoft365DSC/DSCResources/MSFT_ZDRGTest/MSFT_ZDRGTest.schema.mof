@@ -1,0 +1,137 @@
+[ClassVersion("1.0.0.0")]
+class MSFT_DeviceManagementConfigurationPolicyAssignments
+{
+    [Write, Description("The type of the target assignment."), ValueMap{"#microsoft.graph.groupAssignmentTarget","#microsoft.graph.allLicensedUsersAssignmentTarget","#microsoft.graph.allDevicesAssignmentTarget","#microsoft.graph.exclusionGroupAssignmentTarget","#microsoft.graph.configurationManagerCollectionAssignmentTarget"}, Values{"#microsoft.graph.groupAssignmentTarget","#microsoft.graph.allLicensedUsersAssignmentTarget","#microsoft.graph.allDevicesAssignmentTarget","#microsoft.graph.exclusionGroupAssignmentTarget","#microsoft.graph.configurationManagerCollectionAssignmentTarget"}] String dataType;
+    [Write, Description("The type of filter of the target assignment i.e. Exclude or Include. Possible values are:none, include, exclude."), ValueMap{"none","include","exclude"}, Values{"none","include","exclude"}] String deviceAndAppManagementAssignmentFilterType;
+    [Write, Description("The Id of the filter for the target assignment.")] String deviceAndAppManagementAssignmentFilterId;
+    [Write, Description("The group Id that is the target of the assignment.")] String groupId;
+    [Write, Description("The collection Id that is the target of the assignment.(ConfigMgr)")] String collectionId;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphAttackSurfaceReductionRules_Complex
+{
+    [Write, Description("This rule prevents attacks by blocking Adobe Reader from creating additional processes."), EmbeddedInstance("MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair")] String BlockAdobeReaderFromCreatingChildProcesses;
+    [Write, Description("This rule detects suspicious properties within an obfuscated script."), EmbeddedInstance("MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair")] String BlockExecutionOfPotentiallyObfuscatedScripts;
+    [Write, Description("This rule prevents VBA macros from calling Win32 APIs."), EmbeddedInstance("MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair")] String BlockWin32APICallsFromOfficeMacros;
+    [Write, Description("This rule helps prevent credential stealing, by locking down Local Security Authority Subsystem Service (LSASS)."), EmbeddedInstance("MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair")] String BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem;
+    [Write, Description("This rule blocks the following file types from launching unless they meet prevalence or age criteria, or they're in a trusted list or an exclusion list: Executable files (such as .exe, .dll, or .scr)."), EmbeddedInstance("MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair")] String BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion;
+    [Write, Description("This rule prevents scripts from launching potentially malicious downloaded content. Malware written in JavaScript or VBScript often acts as a downloader to fetch and launch other malware from the Internet."), EmbeddedInstance("MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair")] String BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent;
+    [Write, Description("This rule prevents Outlook from creating child processes, while till allowing legitimate Outlook functions."), EmbeddedInstance("MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair")] String BlockOfficeCommunicationAppFromCreatingChildProcesses;
+    [Write, Description("This rule blocks Office apps from creating child processes. This includes Word, Excel, PowerPoint, OneNote, and Access."), EmbeddedInstance("MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair")] String BlockAllOfficeApplicationsFromCreatingChildProcesses;
+    [Write, Description("With this rule, admins can prevent unsigned or untrusted scripts (such as VBScript, JavaScript) and executables (such as .exe, .dll, .scr files) from removable USB drives, including attached SD cards, from running."), EmbeddedInstance("MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair")] String BlockUntrustedUnsignedProcessesThatRunFromUSB;
+    [Write, Description("This rule blocks processes created through PsExec and WMI from running. Both PsExec and WMI can remotely execute code, so there is a risk of malware abusing this functionality for command and control purposes, or to spread an infection throughout an organization's network."), EmbeddedInstance("MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair")] String BlockProcessCreationsFromPSExecAndWMICommands;
+    [Write, Description("This rule prevents malware from abusing WMI to attain persistence on a device. Fileless threats employ various tactics to stay hidden, to avoid being seen in the file system, and to gain periodic execution control. Some threats can abuse the WMI repository and event model to stay hidden."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockPersistenceThroughWMIEventSubscription;
+    [Write, Description("This rule prevents Office apps, including Word, Excel, and PowerPoint, from creating potentially malicious executable content, by blocking malicious code from being written to disk."), EmbeddedInstance("MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair")] String BlockOfficeApplicationsFromCreatingExecutableContent;
+    [Write, Description("This rule blocks code injection attempts from Office apps into other processes."), EmbeddedInstance("MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair")] String BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses;
+    [Write, Description("This rule provides an extra layer of protection against ransomware. It scans executable files entering the system to determine whether they're trustworthy. If the files closely resemble ransomware, this rule blocks them from running, unless they're in a trusted list or an exclusion list."), EmbeddedInstance("MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair")] String UseAdvancedProtectionAgainstRansomware;
+    [Write, Description("This rule blocks the following file types from launching from email opened within the Microsoft Outlook application, or Outlook.com and other popular webmail providers: Executable files (such as .exe, .dll, or .scr), Script files (such as a PowerShell .ps, VisualBasic .vbs, or JavaScript .js file)."), EmbeddedInstance("MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair")] String BlockExecutableContentFromEmailClientAndWebmail;
+    [Write, Description("This rule prevents an application from writing a vulnerable signed driver to disk. In-the-wild, vulnerable signed drivers can be exploited by local applications - that have sufficient privileges - to gain access to the kernel. Vulnerable signed drivers enable attackers to disable or circumvent security solutions, eventually leading to system compromise. The Block abuse of exploited vulnerable signed drivers rule does not block a driver already existing on the system from being loaded."), EmbeddedInstance("MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair")] String BlockAbuseOfExploitedVulnerableSignedDrivers;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule prevents attacks by blocking Adobe Reader from creating additional processes."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockAdobeReaderFromCreatingChildProcesses;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule detects suspicious properties within an obfuscated script."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockExecutionOfPotentiallyObfuscatedScripts;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule prevents VBA macros from calling Win32 APIs."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockWin32APICallsFromOfficeMacros;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule helps prevent credential stealing, by locking down Local Security Authority Subsystem Service (LSASS)."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule blocks the following file types from launching unless they meet prevalence or age criteria, or they're in a trusted list or an exclusion list: Executable files (such as .exe, .dll, or .scr)."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule prevents scripts from launching potentially malicious downloaded content. Malware written in JavaScript or VBScript often acts as a downloader to fetch and launch other malware from the Internet."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule prevents Outlook from creating child processes, while till allowing legitimate Outlook functions."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockOfficeCommunicationAppFromCreatingChildProcesses;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule blocks Office apps from creating child processes. This includes Word, Excel, PowerPoint, OneNote, and Access."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockAllOfficeApplicationsFromCreatingChildProcesses;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("With this rule, admins can prevent unsigned or untrusted scripts (such as VBScript, JavaScript) and executables (such as .exe, .dll, .scr files) from removable USB drives, including attached SD cards, from running."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockUntrustedUnsignedProcessesThatRunFromUSB;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule blocks processes created through PsExec and WMI from running. Both PsExec and WMI can remotely execute code, so there is a risk of malware abusing this functionality for command and control purposes, or to spread an infection throughout an organization's network."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockProcessCreationsFromPSExecAndWMICommands;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule prevents Office apps, including Word, Excel, and PowerPoint, from creating potentially malicious executable content, by blocking malicious code from being written to disk."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockOfficeApplicationsFromCreatingExecutableContent;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule blocks code injection attempts from Office apps into other processes."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule provides an extra layer of protection against ransomware. It scans executable files entering the system to determine whether they're trustworthy. If the files closely resemble ransomware, this rule blocks them from running, unless they're in a trusted list or an exclusion list."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String UseAdvancedProtectionAgainstRansomware;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule blocks the following file types from launching from email opened within the Microsoft Outlook application, or Outlook.com and other popular webmail providers: Executable files (such as .exe, .dll, or .scr), Script files (such as a PowerShell .ps, VisualBasic .vbs, or JavaScript .js file)."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockExecutableContentFromEmailClientAndWebmail;
+};
+[ClassVersion("1.0.0")]
+class MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair
+{
+    [Write, Description("Apply ASR only per rule exclusions.")] String ASROnlyPerRuleExclusions[];
+    [Write, Description("This rule prevents an application from writing a vulnerable signed driver to disk. In-the-wild, vulnerable signed drivers can be exploited by local applications - that have sufficient privileges - to gain access to the kernel. Vulnerable signed drivers enable attackers to disable or circumvent security solutions, eventually leading to system compromise. The Block abuse of exploited vulnerable signed drivers rule does not block a driver already existing on the system from being loaded."), ValueMap{"off","block","audit","warn"}, Values{"off","block","audit","warn"}] String BlockAbuseOfExploitedVulnerableSignedDrivers;
+};
+
+[ClassVersion("1.0.0.0"), FriendlyName("ZDRGTest")]
+class MSFT_ZDRGTest : OMI_BaseResource
+{
+    [Write, Description("Attack surface reduction rules help prevent actions that malware often abuse to compromise devices and networks. "), EmbeddedInstance("MSFT_MicrosoftGraphAttackSurfaceReductionRules_Complex")] String AttackSurfaceReductionRules[];
+    [Write, Description("This policy setting allows you to prevent Attack Surface reduction rules from matching on files under the paths specified or for the fully qualified resources specified. Paths should be added under the Options for this setting. Each entry must be listed as a name value pair, where the name should be a string representation of a path or a fully qualified resource name. As an example, a path might be defined as: c:Windows to exclude all files in this directory. A fully qualified resource name might be defined as: C:WindowsApp.exe. Value type is string.")] String AttackSurfaceReductionOnlyExclusions[];
+    [Write, Description("The previous name was EnableGuardMyFolders and changed to EnableControlledFolderAccess. This policy enables setting the state (On/Off/Audit) for the controlled folder access feature. The controlled folder access feature removes modify and delete permissions from untrusted applications to certain folders such as My Documents. Value type is integer and the range is 0 - 2."), ValueMap{0,1,2,3,4}, Values{0,1,2,3,4}] UInt32 EnableControlledFolderAccess;
+    [Write, Description("The previous name was GuardedFoldersList and changed to ControlledFolderAccessProtectedFolders. This policy settings allows adding user-specified folder locationsto the controlled folder access feature. These folders will complement the system defined folders such as My Documents and My Pictures. The list of system folders will be displayed in the user interface and can not be changed. Value type is string. Use the  as the substring separator.")] String ControlledFolderAccessProtectedFolders[];
+    [Write, Description("The previous name was GuardedFoldersAllowedApplications and changed to ControlledFolderAccessAllowedApplications. This policy setting allows user-specified applications to the controlled folder access feature. Adding an allowed application means the controlled folder access feature will allow the application to modify or delete content in certain folders such as My Documents. In most cases it will not be necessary to add entries. Windows Defender Antivirus will automatically detect and dynamically add applications that are friendly. Value type is string. Use the  as the substring separator.")] String ControlledFolderAccessAllowedApplications[];
+    [Write, Description("Represents the assignment to the Intune policy."), EmbeddedInstance("MSFT_DeviceManagementConfigurationPolicyAssignments")] String Assignments[];
+    [Write, Description("Present ensures the policy exists, absent ensures it is removed."), ValueMap{"Present","Absent"}, Values{"Present","Absent"}] string Ensure;
+    [Write, Description("Credentials of the Admin"), EmbeddedInstance("MSFT_Credential")] string Credential;
+    [Write, Description("Id of the Azure Active Directory application to authenticate with.")] String ApplicationId;
+    [Write, Description("Id of the Azure Active Directory tenant used for authentication.")] String TenantId;
+    [Write, Description("Secret of the Azure Active Directory tenant used for authentication."), EmbeddedInstance("MSFT_Credential")] String ApplicationSecret;
+    [Write, Description("Thumbprint of the Azure Active Directory application's authentication certificate to use for authentication.")] String CertificateThumbprint;
+    [Write, Description("Managed ID being used for authentication.")] Boolean ManagedIdentity;
+};
