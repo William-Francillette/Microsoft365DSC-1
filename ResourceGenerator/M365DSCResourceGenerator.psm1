@@ -55,6 +55,10 @@ function New-M365DSCResource
 
         [Parameter()]
         [System.String]
+        $TemplateId,
+
+        [Parameter()]
+        [System.String]
         $DateFormat="o",
 
         # Use this switch with caution.
@@ -172,13 +176,25 @@ function New-M365DSCResource
 
         $global:ComplexList=@()
         $cimClasses = Get-Microsoft365DSCModuleCimClass -ResourceName $ResourceName
-        $typeProperties = Get-TypeProperties `
-            -CmdletDefinition $cmdletDefinition `
-            -Entity $selectedODataType `
-            -IncludeNavigationProperties $IncludeNavigationProperties `
-            -CimClasses $cimClasses `
-            -Workload $Workload
-        $global:ComplexList=$null
+        $global:searchedEntity = $selectedODataType
+        if($CmdLetNoun -eq 'MgDeviceManagementConfigurationPolicy' -and -not [String]::IsNullOrWhiteSpace($TemplateId))
+        {
+            New-M365DSCConnection -Workload 'MicrosoftGraph' `
+                -InboundParameters $PSBoundParameters `
+                -ProfileName 'beta'
+            $typeProperties = Get-IntuneSettingCatalogProperty -TemplateId $TemplateId -CimClasses $cimClasses
+        }
+        else
+        {
+            $typeProperties = Get-TypeProperties `
+                -CmdletDefinition $cmdletDefinition `
+                -Entity $selectedODataType `
+                -IncludeNavigationProperties $IncludeNavigationProperties `
+                -CimClasses $cimClasses `
+                -Workload $Workload
+        }
+        $global:ComplexList = $null
+        $global:searchedEntity = $null
         [Hashtable[]]$parameterInformation = Get-ParameterBlockInformation `
             -Properties $typeProperties `
             -DefaultParameterSetProperties $defaultParameterSetProperties
@@ -326,7 +342,12 @@ function New-M365DSCResource
                 $alternativeKey = 'Name'
             }
         }
-
+        if ($CmdLetNoun -eq 'MgDeviceManagementConfigurationPolicy')
+        {
+            $primaryKey = 'Id'
+            $alternativeKey = 'Name'
+            $getKeyIdentifier = @('DeviceManagementConfigurationPolicyId')
+        }
         if ($null -ne $getKeyIdentifier )
         {
             $getParameterString = [System.Text.StringBuilder]::New()
@@ -347,6 +368,12 @@ function New-M365DSCResource
             [String]$getKeyIdentifier = $getParameterString.ToString()
         }
 
+        $expandIdentifier = ''
+        if ($IncludeNavigationProperties)
+        {
+            $navigationProperties = ($parameterInformation | Where-Object {$_.IsNavigationProperty}).name
+            $expandIdentifier = " -expandProperty `"$($navigationProperties -join ',')`""
+        }
         $getDefaultParameterSet = $getCmdlet.ParameterSets | Where-Object -FilterScript { $_.Name -eq 'List' }
         $getListIdentifier =$getDefaultParameterSet.Parameters.Name
         $getAlternativeFilterString = [System.Text.StringBuilder]::New()
@@ -354,16 +381,42 @@ function New-M365DSCResource
         {
             $getAlternativeFilterString.appendline("                    -Filter `"$alternativeKey eq '`$$alternativeKey'`" ``")|out-null
             $getAlternativeFilterString.append("                    -ErrorAction SilentlyContinue")|out-null
+            if ($CmdLetNoun -ne 'MgDeviceManagementConfigurationPolicy')
+            {
+                $getAlternativeFilterString.appendline(" | Where-Object ``")|out-null
+                $getAlternativeFilterString.appendline("                    -FilterScript { ``")|out-null
+                $getAlternativeFilterString.appendline("                        `$_.AdditionalProperties.'@odata.type' -eq `"`#microsoft.graph.$SelectedODataType`" ``")|out-null
+                $getAlternativeFilterString.append("                    }")|out-null
+            }
+            else
+            {
+                $getAlternativeFilterString.appendline("`r`n                if (`$null -ne `$getValue)")|out-null
+                $getAlternativeFilterString.appendline("                {")|out-null
+                $getAlternativeFilterString.appendline("                    `$getValue = Get-$($CmdLetNoun) -$($actualtype)Id `$getValue.$primaryKey -expandProperty ""settings"" -ErrorAction SilentlyContinue")|out-null
+                $getAlternativeFilterString.append("                }")|out-null
+            }
+            if ($IncludeNavigationProperties)
+            {
+                $getAlternativeFilterString.appendline("`r`n                if (`$null -ne `$getValue)")|out-null
+                $getAlternativeFilterString.appendline("                {")|out-null
+                $getAlternativeFilterString.appendline("                    `$getValue = Get-$($CmdLetNoun) -$($actualtype)Id `$getValue.$primaryKey$expandIdentifier -ErrorAction SilentlyContinue")|out-null
+                $getAlternativeFilterString.append("                }")|out-null
+            }
         }
         else
         {
             $getAlternativeFilterString.appendline("                    -ErrorAction SilentlyContinue | Where-Object ``")|out-null
             $getAlternativeFilterString.appendline("                    -FilterScript { ``")|out-null
             $getAlternativeFilterString.appendline("                        `$_.$alternativeKey -eq `"`$(`$$alternativeKey)`" ``")|out-null
+            if ($CmdLetNoun -ne 'MgDeviceManagementConfigurationPolicy')
+            {
+                $getAlternativeFilterString.appendline("                        -and `$_.AdditionalProperties.'@odata.type' -eq `"`#microsoft.graph.$SelectedODataType`" ``")|out-null
+            }
             $getAlternativeFilterString.append("                    }")|out-null
         }
         Write-TokenReplacement -Token '<AlternativeFilter>' -Value $getAlternativeFilterString.ToString() -FilePath $moduleFilePath
 
+        Write-TokenReplacement -Token '<ExpandIdentifier>' -Value $expandIdentifier -FilePath $moduleFilePath
         Write-TokenReplacement -Token '<ParameterBlock>' -Value $parameterString -FilePath $moduleFilePath
         Write-TokenReplacement -Token '<#Workload#>' -Value $Workload -FilePath $moduleFilePath
         Write-TokenReplacement -Token '<#APIVersion#>' -Value $ApiVersion -FilePath $moduleFilePath
@@ -376,6 +429,10 @@ function New-M365DSCResource
         {
             $complexTypeConstructor = $hashtableResults.ComplexTypeConstructor
             $complexTypeConstructor = "`r`n        #region resource generator code`r`n" + $complexTypeConstructor
+            if ($CmdLetNoun -ne 'MgDeviceManagementConfigurationPolicy')
+            {
+                $complexTypeConstructor = $complexTypeConstructor.Substring(0, $complexTypeConstructor.Length -2)
+            }
             $complexTypeConstructor = $complexTypeConstructor + "        #endregion`r`n"
         }
         Write-TokenReplacement -Token '<ComplexTypeConstructor>' -Value $complexTypeConstructor -FilePath $moduleFilePath
@@ -467,14 +524,18 @@ function New-M365DSCResource
         {
             $trailingCharRemoval=@'
             #removing trailing commas and semi colons between items of an array of cim instances added by Convert-DSCStringParamToVariable
-            $currentDSCBlock=$currentDSCBlock.replace( "    ,`r`n" , "    `r`n" )
-            $currentDSCBlock=$currentDSCBlock.replace( "`r`n;`r`n" , "`r`n" )
+            $currentDSCBlock = Remove-M365DSCCimInstanceTrailingCharacterFromExport -DSCBlock $currentDSCBlock
 '@
         }
         $requiredKey = ''
         if(-not [String]::IsNullOrEmpty($alternativeKey))
         {
-            $requiredKey = "`r`n                DisplayName           =  `$config.DisplayName"
+            $keyName = 'DisplayName'
+            if ($CmdLetNoun -eq 'MgDeviceManagementConfigurationPolicy')
+            {
+                $keyName = 'Name'
+            }
+            $requiredKey = "`r`n                $keyName           =  `$config.$keyName"
         }
         Write-TokenReplacement -Token '<exportGetCommand>' -Value $exportGetCommand.ToString() -FilePath $moduleFilePath
         Write-TokenReplacement -Token '<RequiredKey>' -Value $requiredKey -FilePath $moduleFilePath
@@ -1191,7 +1252,15 @@ function Get-TypeProperties
 
         [Parameter()]
         [System.Boolean]
-        $IncludeNavigationProperties=$true,
+        $IncludeNavigationProperties=$false,
+
+        [Parameter()]
+        [System.Boolean]
+        $FromNavigationProperties=$false,
+
+        [Parameter()]
+        [System.Boolean]
+        $FromNavigationProperties=$false,
 
         [Parameter()]
         [System.String[]]
@@ -1272,9 +1341,9 @@ function Get-TypeProperties
         }
         if($isComplex)
         {
+            #Clear-Variable abstractType
             $abstractType=$namespace.ComplexType|Where-Object -FilterScript {$_.BaseType -eq "graph.$baseType"}
-
-            foreach($subType in $abstractType)
+            foreach ($subType in $abstractType)
             {
                 $rawProperties=$subType.Property
                 foreach($property in $rawProperties)
@@ -1314,7 +1383,7 @@ function Get-TypeProperties
                 }
             }
 
-            if(([Array]$abstractType.Name).Count -gt 0)
+            if ($null -ne $abstractType.Name -and ([array]$abstractType).Count -gt 0 -and $entity -eq $basetype )
             {
                 $myProperty = @{}
                 $myProperty.Add('Name','@odata.type')
@@ -1328,7 +1397,8 @@ function Get-TypeProperties
             }
         }
 
-        if($IncludeNavigationProperties -and $null -ne $entityType.NavigationProperty)
+        #FromNavigationProperties prevents adding nested level of navigationProperties
+        if ($IncludeNavigationProperties -and -not $FromNavigationProperties -and $null -ne $entityType.NavigationProperty)
         {
             $rawProperties=$entityType.NavigationProperty
             foreach($property in $rawProperties)
@@ -1350,7 +1420,6 @@ function Get-TypeProperties
                 $properties+=$myProperty
             }
         }
-
         $baseType=$null
         if(-not [String]::IsNullOrEmpty($entityType.BaseType))
         {
@@ -1410,7 +1479,9 @@ function Get-TypeProperties
                         -CmdletDefinition $CmdletDefinition `
                         -Entity $derivedType `
                         -CimClasses $CimClasses `
-                        -Workload $Workload
+                        -Workload $Workload `
+                        -ParentPropertyName $property.Name `
+                        -FromNavigationProperties $(if($null -ne $property.IsNavigationProperty){$property.IsNavigationProperty}else{$false})
                     $property.Add('Properties', $nestedProperties)
                 }
             }
@@ -1445,6 +1516,194 @@ function Get-TypeProperties
         $result+=$property
     }
     return $result
+}
+
+function Get-IntuneSettingCatalogSettingDefinition
+{
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        $TemplateSetting,
+
+        [Parameter()]
+        [System.String[]]
+        $CimClasses
+    )
+
+    $property = @{}
+    $settingInstanceTemplate = $templateSetting.SettingInstanceTemplate
+    $settingFullName = $(if($templateSetting.SettingDefinitions.count -eq 1){$templateSetting.SettingDefinitions.id}else{$settingInstanceTemplate.settingDefinitionId})
+    $settingDefinition = $templateSetting.SettingDefinitions | Where-Object {$_.Id -eq $settingFullName}
+    $settingName = $settingDefinition.Name
+
+    if ($null -eq $settingInstanceTemplate )
+    {
+        $settingType = $settingDefinition.AdditionalProperties.'@odata.type'.replace('Definition', 'Instance')
+    }
+    elseif ([String]::IsNullOrWhiteSpace($settingInstanceTemplate.AdditionalProperties.'@odata.type'))
+    {
+        $settingType = $settingInstanceTemplate.'@odata.type'.replace('Template', '')
+    }
+    else
+    {
+        $settingType = $settingInstanceTemplate.AdditionalProperties.'@odata.type'.replace('Template', '')
+    }
+
+    switch -Wildcard ($settingType)
+    {
+        "*simple*"
+        {
+            $settingDerivedType = $settingDefinition.AdditionalProperties.valueDefinition.'@odata.type'
+            $settingDerivedType = $settingDerivedType.replace('#microsoft.graph.deviceManagementConfiguration','')
+            $settingDerivedType = $settingDerivedType.replace('SettingValueDefinition','')
+            if ($settingDerivedType -eq 'Integer')
+            {
+                $settingDerivedType = 'Int32'
+            }
+            $settingDerivedType = "System.$settingDerivedType"
+            $parentSettingId = $settingDefinition.AdditionalProperties.dependentOn[0].parentSettingId
+            $valueType = $settingType.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','ValueTemplate')
+            $valueType = Get-StringFirstCharacterToLower -Value $valueType
+            if(-not [string]::isNullOrWhiteSpace($settingInstanceTemplate.AdditionalProperties.$valueType.settingValueTemplateId))
+            {
+                $settingValueTemplateId = $settingInstanceTemplate.AdditionalProperties.$valueType.settingValueTemplateId
+            }
+        }
+        "*choice*"
+        {
+            $settingDerivedType = $settingDefinition.AdditionalProperties.options[0].optionValue.'@odata.type'
+            $settingDerivedType = $settingDerivedType.replace('#microsoft.graph.deviceManagementConfiguration','')
+            $settingDerivedType = $settingDerivedType.replace('SettingValueDefinition','')
+            $settingDerivedType = $settingDerivedType.replace('SettingValue','')
+            if ($settingDerivedType -eq 'Integer')
+            {
+                $settingDerivedType = 'Int32'
+            }
+            $settingDerivedType = "System.$settingDerivedType"
+            $settingMembers = $settingDefinition.AdditionalProperties.options.itemId| foreach-object{$_.split('_')|Select-Object -last 1}
+            $parentSettingId = $settingDefinition.AdditionalProperties.options.dependentOn.parentSettingId
+            if($null -ne $parentSettingId -and $parentSettingId -gt 1)
+            {
+                $parentSettingId = $parentSettingId[0]
+            }
+            $childIds = $templateSetting.SettingDefinitions.AdditionalProperties.options.dependedOnBy.dependedOnBy
+            $children = $templateSetting.SettingDefinitions | Where-Object{$_.Id -in $childIds }
+            $properties = @()
+            foreach ($child in $children)
+            {
+                $settingDefinitions = @()
+                $settingDefinitions += $child
+                $settingDefinitions += $templateSetting.SettingDefinitions | Where-Object { $_.AdditionalProperties.options.dependentOn.parentSettingId  -eq $child.id -or $_.AdditionalProperties.dependentOn.parentSettingId -eq $child.id}
+
+                $childtemplateSetting = @{
+                    SettingDefinitions = $settingDefinitions
+                    SettingInstanceTemplate = $templateSetting.SettingInstanceTemplate.AdditionalProperties.choiceSettingValueTemplate.children | Where-object {$_.settingDefinitionId -eq $child.id}
+                }
+                $properties += Get-IntuneSettingCatalogSettingDefinition -TemplateSetting $childtemplateSetting -CimClasses $CimClasses
+            }
+            $property.Add('Members',$settingMembers)
+            $property.Add('Properties',$properties)
+            $valueType = $settingType.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','ValueTemplate')
+            $valueType = Get-StringFirstCharacterToLower -Value $valueType
+            if(-not [string]::isNullOrWhiteSpace($settingInstanceTemplate.AdditionalProperties.$valueType.settingValueTemplateId))
+            {
+                $settingValueTemplateId = $settingInstanceTemplate.AdditionalProperties.$valueType.settingValueTemplateId
+            }
+            if(-not [string]::isNullOrWhiteSpace($settingInstanceTemplate.$valueType.settingValueTemplateId))
+            {
+                $settingValueTemplateId = $settingInstanceTemplate.$valueType.settingValueTemplateId
+            }
+        }
+        "*group*"
+        {
+            $settingDerivedType = "$($settingName)_Complex"
+            $children = $templateSetting.SettingDefinitions | Where-Object{$_.id -in $settingDefinition.AdditionalProperties.childIds }
+            $parentSettingId = $settingDefinition.AdditionalProperties.dependentOn.parentSettingId
+
+            $properties = @()
+            foreach ($child in $children)
+            {
+                $settingDefinitions = @()
+                $settingDefinitions += $child
+                $settingDefinitions += $templateSetting.SettingDefinitions | Where-Object { $_.AdditionalProperties.options.dependentOn.parentSettingId  -eq $child.id -or $_.AdditionalProperties.dependentOn.parentSettingId -eq $child.id}
+
+                $childtemplateSetting = @{
+                    SettingDefinitions = $settingDefinitions
+                    SettingInstanceTemplate = $templateSetting.SettingInstanceTemplate.AdditionalProperties.groupSettingCollectionValueTemplate.children | Where-object {$_.settingDefinitionId -eq $child.id}
+                }
+                $properties += Get-IntuneSettingCatalogSettingDefinition -TemplateSetting $childtemplateSetting -CimClasses $CimClasses
+            }
+            $property.Add('Properties',$properties)
+            $valueType = $settingType.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','ValueTemplate')
+            $valueType = Get-StringFirstCharacterToLower -Value $valueType
+            if(-not [string]::isNullOrWhiteSpace($settingInstanceTemplate.AdditionalProperties.$valueType.settingValueTemplateId))
+            {
+                $settingValueTemplateId = $settingInstanceTemplate.AdditionalProperties.$valueType.settingValueTemplateId
+            }
+        }
+    }
+
+    $settingInstanceTemplateId = $settingInstanceTemplate.settingInstanceTemplateId
+
+    $isAbstract = $false
+    $IsRootProperty = $false
+
+
+    $property.Add('Name',$settingName)
+    $property.Add('FullName',$settingFullName)
+    $property.Add('Type',$settingType)
+    $property.Add('IsRootProperty',$IsRootProperty)
+    $property.Add('ParentSettingId',$parentSettingId)
+    $property.Add('DerivedType',$settingDerivedType)
+    $property.Add('SettingInstanceTemplateId',$settingInstanceTemplateId)
+    $property.Add('SettingValueTemplateId',$settingvalueTemplateId)
+    $description = ''
+    if (-not [String]::IsNullOrWhiteSpace($settingDefinition.Description))
+    {
+        $description =$settingDefinition.Description.replace('"',"'")
+        $description =$description -replace '[^\p{L}\p{Nd}/(/}/_ -.,=:)'']', ''
+    }
+    $property.Add('Description', $description)
+    $property.Add('IsAbstract',$isAbstract)
+    $property.Add('IsArray',$($settingType -like '*Collection*'))
+    $property.Add('IsEnumType', $($settingType -like '*Choice*'))
+    $property.Add('IsComplexType', $($null -ne $property.properties -and $property.properties.count -gt 0))
+    if($property.properties.count -eq 1)
+    {
+        $clone = $property.clone()
+        $property.remove('Members')
+        $property.IsEnumType = $false
+        $property.DerivedType = "$($property.Name)_KeyValuePair"
+        $clone.IsComplexType = $false
+        $clone.Properties = @()
+        $property.properties += $clone
+    }
+
+    return $property
+}
+function Get-IntuneSettingCatalogProperty
+{
+    [CmdletBinding()]
+    param (
+        [Parameter(Mandatory = $true)]
+        $TemplateId,
+
+        [Parameter()]
+        [System.String[]]
+        $CimClasses
+    )
+
+    $properties=@()
+    $templateSettings = Get-MgDeviceManagementConfigurationPolicyTemplateSettingTemplate `
+        -DeviceManagementConfigurationPolicyTemplateId $TemplateId `
+        -ExpandProperty 'settingDefinitions'
+
+    foreach ($templateSetting in $templateSettings)
+    {
+        $properties += Get-IntuneSettingCatalogSettingDefinition -TemplateSetting $templateSetting -CimClasses $CimClasses
+    }
+
+    return $properties
 }
 function Get-Microsoft365DSCModuleCimClass
 {
@@ -1521,6 +1780,9 @@ function Get-ComplexTypeConstructorToString
         $Property,
 
         [Parameter()]
+        $ParentProperty,
+
+        [Parameter()]
         [System.String]
         $ParentPropertyName,
 
@@ -1583,14 +1845,14 @@ function Get-ComplexTypeConstructorToString
         if($isNested)
         {
             $valuePrefix=$ParentPropertyValuePath
-            if($null -eq $valuePrefix)
+            if ([String]::isNullOrWhiteSpace($valuePrefix))
             {
                 $propRoot=$ParentPropertyName.replace("my","")
                 $valuePrefix="current$propRoot."
-                if($property.IsRootProperty -eq $false -and -not $IsNested)
-                {
-                    $valuePrefix += "AdditionalProperties."
-                }
+                #if ($ParentProperty.IsNavigationProperty)
+                #{
+                #    $valuePrefix += "AdditionalProperties."
+                #}
             }
         }
         $iterationPropertyName="current$propertyName"
@@ -1634,8 +1896,7 @@ function Get-ComplexTypeConstructorToString
         {
             $valuePrefix += "AdditionalProperties."
         }
-
-        if($nestedProperty.IsRootProperty -eq $false -or $IsParentFromAdditionalProperties)
+        if ($nestedProperty.IsRootProperty -eq $false -or $IsParentFromAdditionalProperties)
         {
             $AssignedPropertyName = Get-StringFirstCharacterToLower -Value $nestedProperty.Name
         }
@@ -1661,6 +1922,7 @@ function Get-ComplexTypeConstructorToString
                     -Property $nestedProperty `
                     -IndentCount $IndentCount `
                     -IsNested $true `
+                    -ParentProperty $Property `
                     -ParentPropertyName $tempPropertyName `
                     -ParentPropertyValuePath $referencePrefix `
                     -IsParentFromAdditionalProperties (-not $Property.IsRootProperty)
@@ -1994,7 +2256,7 @@ function Get-ParameterBlockInformation
         $cmdletParameter = $DefaultParameterSetProperties | Where-Object -FilterScript { $_.Name -eq $property.Name }
         if (($null -ne $cmdletParameter `
                 -and $cmdletParameter.IsMandatory -eq $true) `
-            -or $property.Name -eq 'Id' -or $property.Name -eq 'DisplayName')
+            -or $property.Name -in ('Id','DisplayName','Name'))
         {
             $isMandatory = $true
             $parameterAttribute = "[Parameter(Mandatory = `$true)]"
@@ -2004,23 +2266,23 @@ function Get-ParameterBlockInformation
             $parameterAttribute = '[Parameter()]'
         }
 
-        $parameterName = $property.Name
-        $parameterNameFirstLetter = $parameterName.Substring(0, 1)
-        $parameterNameFirstLetter = $parameterNameFirstLetter.ToUpper()
-        $parameterNameCamelCaseString = $parameterName.Substring(1)
-        $parameterName = "$($parameterNameFirstLetter)$($parameterNameCamelCaseString)"
+        $parameterName = Get-StringFirstCharacterToUpper $property.Name
 
         $myParam = @{
-            IsMandatory     = $isMandatory
-            Attribute       = $parameterAttribute
-            Type            = $property.DerivedType
-            Name            = $parameterName
-            Description     = $property.Description
-            IsArray         = $property.IsArray
-            IsComplexType   = $property.IsComplexType
-            IsEnumType      = $property.IsEnumType
-            IsRootProperty  = $property.IsRootProperty
-            ParentType      = $property.ParentType
+            IsMandatory                 = $isMandatory
+            Attribute                   = $parameterAttribute
+            Type                        = $property.DerivedType
+            Name                        = $parameterName
+            Description                 = $property.Description
+            IsArray                     = $property.IsArray
+            IsComplexType               = $property.IsComplexType
+            IsEnumType                  = $property.IsEnumType
+            IsRootProperty              = $property.IsRootProperty
+            ParentType                  = $property.ParentType
+            ParentSettingId             = $property.ParentSettingId
+            SettingInstanceTemplateId   = $property.SettingInstanceTemplateId
+            SettingValueTemplateId      = $property.SettingValueTemplateId
+            IsNavigationProperty        = $(if($null -ne $property.IsNavigationProperty){$property.IsNavigationProperty}else{$false})
         }
         if ($property.IsEnumType)
         {
@@ -2068,6 +2330,11 @@ function Get-M365DSCDRGParameterType
             break;
         }
         'system.int32'
+        {
+            $parameterType = 'System.Int32'
+            break;
+        }
+        'integer'
         {
             $parameterType = 'System.Int32'
             break;
@@ -2140,6 +2407,10 @@ function Get-M365DSCDRGParameterTypeForSchema
         '*.int64'
         {
             $parameterType = 'UInt64'
+        }
+        'Integer'
+        {
+            $parameterType = 'UInt32'
         }
         Default
         {
@@ -2341,6 +2612,18 @@ function Get-M365DSCFakeValues
                             $fakeValue = "#microsoft.graph." + $parameter.Members[0]
                         }
                     }
+                    if ($IntroduceDrift)
+                    {
+                        $fakeValue = 'FakeStringValueDrift'
+                        if ($parameter.Members)
+                        {
+                            $fakeValue = $parameter.Members[1]
+                            if ($parameter.Name -eq "@odata.type")
+                            {
+                                $fakeValue = "#microsoft.graph." + $parameter.Members[1]
+                            }
+                        }
+                    }
                     $hashValue = $fakeValue
                     if($parameter.IsArray)
                     {
@@ -2366,10 +2649,18 @@ function Get-M365DSCFakeValues
                 }
                 '*.Int32'
                 {
-                    [Int32]$hashValue = 25
+                    [Int32]$fakeValue1 = 25
+                    [Int32]$fakeValue2 = 7
+                    if ($parameter.Members)
+                    {
+                        $fakeValue1 = $parameter.Members[0]
+                        $fakeValue2 = $parameter.Members[1]
+                    }
+                    [int32]$hashValue = $fakeValue1
+
                     if ($IntroduceDrift)
                     {
-                        $hashValue = 7
+                        [int32]$hashValue = $fakeValue2
                     }
                     break
                 }
@@ -2419,6 +2710,7 @@ function Get-M365DSCFakeValues
                 {
                     $parameterName = Get-StringFirstCharacterToLower -Value $parameterName
                 }
+                #write-host -ForegroundColor Yellow $parameterName
                 $result.Add($parameterName, $hashValue)
             }
         }
@@ -2747,7 +3039,14 @@ function New-M365SchemaPropertySet
                     $mySet = ''
                     foreach ($member in $_.Members)
                     {
-                        $mySet += "`"" + $member + "`","
+                        if($propertyType -eq 'String')
+                        {
+                            $mySet += "`"" + $member + "`","
+                        }
+                        else
+                        {
+                            $mySet += $member + ","
+                        }
                     }
                     $mySet = $mySet.Substring(0, $mySet.Length - 1)
                     $propertySet = ", ValueMap{$mySet}, Values{$mySet}"
@@ -2998,7 +3297,7 @@ function Get-ComplexTypeMapping
 
             if($nestedProperty.IsComplexType)
             {
-                $complexMapping += Get-ComplexTypeMapping -Property $nestedProperty -Workload $Workload
+                $complexMapping += Get-ComplexTypeMapping -Property $nestedProperty -Workload $Workload | Where-Object {$_.name -notin $complexMapping.Name}
             }
         }
         return $complexMapping
@@ -3071,7 +3370,10 @@ function New-M365HashTableMapping
                 $CimInstanceName = $CimInstanceName -replace '[[\]]', ''
                 $CimInstanceName = $Workload + $CimInstanceName
                 $global:ComplexList = @()
-                $complexTypeConstructor.appendLine((Get-ComplexTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))
+                if ($GraphNoun -ne 'MgDeviceManagementConfigurationPolicy')
+                {
+                    $complexTypeConstructor.appendLine((Get-ComplexTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))
+                }
                 $global:ComplexList = $null
                 [Array]$complexMapping = Get-ComplexTypeMapping -Property $property -Workload $Workload
                 $complexMappingString = [System.Text.StringBuilder]::New()
@@ -3123,15 +3425,15 @@ function New-M365HashTableMapping
             }
             if($property.IsEnumType)
             {
-                $enumTypeConstructor.appendLine((Get-EnumTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))
+                $enumTypeConstructor.appendLine((Get-EnumTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))| out-null
             }
             if($property.Type -like "System.Date*")
             {
-                $dateTypeConstructor.appendLine((Get-DateTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))
+                $dateTypeConstructor.appendLine((Get-DateTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))| out-null
             }
             if($property.Type -like "System.Time*")
             {
-                $timeTypeConstructor.appendLine((Get-TimeTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))
+                $timeTypeConstructor.appendLine((Get-TimeTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))| out-null
             }
 
             $spacing = $biggestParamaterLength - $property.Name.length
@@ -3192,7 +3494,35 @@ function New-M365HashTableMapping
         $spacing = $biggestParamaterLength - $key.length
         $hashtable += "            $($key + ' ' * $spacing) = $keyValue`r`n"
     }
+
+    $settingCatalogComplexConstructor =@"
+        $complexTemplateReference = @{
+            TemplateId = $getValue.TemplateReference.TemplateId
+        }
+
+        $complexSettings = @()
+        foreach (`$setting in `$getValue.settings)
+        {
+            $($property.name)  = `$setting.SettingInstance.AdditionalProperties.$($property.Type.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','Value'))
+            $complexSettingInstance = @{}
+            $complexSettingInstance.Add('SettingDefinitionId', $currentSettings.settingInstance.settingDefinitionId)
+            $complexSettingInstance.Add('odataType', $currentSettings.settingInstance.AdditionalProperties.'@odata.type')
+            $valueName = $currentSettings.settingInstance.AdditionalProperties.'@odata.type'.replace('#microsoft.graph.deviceManagementConfiguration', '').replace('Instance', 'Value')
+            $valueName = Get-StringFirstCharacterToLower -Value $valueName
+            $rawValue = $currentSettings.settingInstance.AdditionalProperties.$valueName
+            $complexValue = Get-SettingCatalogSettingValue -SettingValue $rawValue -SettingValueType $currentSettings.settingInstance.AdditionalProperties.'@odata.type'
+            $complexSettingInstance.Add($valueName,$complexValue)
+            $mySettings.Add('SettingInstance', $complexSettingInstance)
+            if ($mySettings.values.Where({ $null -ne $_ }).count -gt 0)
+            {
+                $complexSettings += $mySettings
+            }
+        }
+
+"@
+
     $results.Add('ConvertToVariable', $convertToVariable)
+    #$results.Add('ComplexTypeConstructor', $(if($GraphNoun -eq 'MgDeviceManagementConfigurationPolicy'){$settingCatalogComplexConstructor}else{$complexTypeConstructor.ToString()}))
     $results.Add('ComplexTypeConstructor', $complexTypeConstructor.ToString())
     $results.Add('EnumTypeConstructor', $enumTypeConstructor.ToString())
     $results.Add('DateTypeConstructor', $dateTypeConstructor.ToString())
@@ -3203,7 +3533,83 @@ function New-M365HashTableMapping
     $results.Add('ComplexTypeContent', $complexTypeContent)
     return $results
 }
+function Get-SettingCatalogSettingValuePathFromDefinition
+{
+    param (
+        [Parameter()]
+        $Property,
 
+        [Parameter()]
+        [System.String]
+        $Prefix = '',
+
+        [Parameter()]
+        [System.UInt32]
+        $IndentLevel = 2
+    )
+
+    $Indent = '    ' * $IndentLevel
+    #$returnPropertyString = "$Indent`$setting.AdditionalProperties."
+    $returnPropertyString = ''
+    $settingValueName = $property.Type.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','Value')
+    switch ($Property.Type)
+    {
+        "#microsoft.graph.deviceManagementConfigurationGroupSettingCollectionInstance"
+        {
+            $returnPropertyString = "$Indent$($property.Name) = @{`r`n"
+            $nChild = 0
+            Foreach ($child in $Property.Properties)
+            {
+                $returnPropertyString += Get-SettingCatalogSettingValuePathFromDefinition `
+                                            -Property $child `
+                                            -Prefix "`$setting.SettingInstance.AdditionalProperties.groupSettingCollectionValue.children[$nChild]" `
+                                            -IndentLevel ($IndentLevel + 1)
+                $nChild ++
+            }
+            $returnPropertyString += "$Indent}`r`n"
+        }
+        "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance"
+        {
+            #$returnPropertyString = "$Indent`$settingValue = (`$setting.SettingInstance.AdditionalProperties.choiceSettingValue.value).split('_') | Select-Object -Last 1 `r`n"
+            #if ($Property.IsComplexType)
+            if ([String]::IsNullOrWhiteSpace($Prefix))
+            {
+                $Prefix = '`$setting.SettingInstance.AdditionalProperties'
+            }
+            if ($Property.IsComplexType)
+            {
+                $returnPropertyString += "$Indent$($property.Name) = @{`r`n"
+                $nChild = 0
+                foreach ($child in $propery.Properties)
+                {
+                    $returnPropertyString += Get-SettingCatalogSettingValuePathFromDefinition `
+                                                -Property $child `
+                                                -Prefix "`$setting.SettingInstance.AdditionalProperties.groupSettingCollectionValue.children[$nChild]" `
+                                                -IndentLevel ($IndentLevel + 1)
+                    $nChild ++
+                }
+                $returnPropertyString += "$Indent}`r`n"
+            }
+            else
+            {
+                $returnPropertyString += "$Indent$($property.Name) = (`$setting.SettingInstance.AdditionalProperties.choiceSettingValue.value).split('_') | Select-Object -Last 1 `r`n"
+            }
+        }
+        "#microsoft.graph.deviceManagementConfigurationSimpleSettingCollectionInstance"
+        {
+            if ([String]::IsNullOrWhiteSpace($Prefix))
+            {
+                $returnPropertyString += "$Indent$($property.Name) = `$setting.SettingInstance.AdditionalProperties.simpleSettingCollectionValue.value`r`n"
+            }
+            else
+            {
+                $returnPropertyString += "$Indent$($property.Name) = $Prefix.simpleSettingCollectionValue.value`r`n"
+            }
+        }
+    }
+
+    return $returnPropertyString
+}
 function Get-ParameterBlockStringForModule
 {
     param (
@@ -3222,7 +3628,14 @@ function Get-ParameterBlockStringForModule
                 $validateSet = '[ValidateSet('
                 foreach ($member in $_.Members)
                 {
-                    $validateSet += "'" + $member + "',"
+                    if($_.Type -eq 'String')
+                    {
+                        $validateSet += "'" + $member + "',"
+                    }
+                    else
+                    {
+                        $validateSet += $member + ","
+                    }
                 }
                 $validateSet = $validateSet.substring(0, $validateSet.length - 1)
                 $validateSet += ')]'
