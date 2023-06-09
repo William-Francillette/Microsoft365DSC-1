@@ -61,71 +61,73 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                     attackSurfaceReductionRules = [CimInstance[]]@(
                         (New-CimInstance -ClassName MSFT_MicrosoftGraphAttackSurfaceReductionRules_Complex -Property @{
-                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair -Property @{
+                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair -Property @{
+                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair -Property @{
+                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair -Property @{
+                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableContentFromEmailClientAndWebmail = "off"
+                                value = "off"
                             } -ClientOnly)
-                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair -Property @{
+                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                useAdvancedProtectionAgainstRansomware = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair -Property @{
+                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair -Property @{
+                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair -Property @{
+                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair -Property @{
+                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockWin32APICallsFromOfficeMacros = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                             blockPersistenceThroughWMIEventSubscription = "off"
-                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair -Property @{
+                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAdobeReaderFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                         } -ClientOnly)
                     )
                     controlledFolderAccessAllowedApplications = @("FakeStringValue")
                     controlledFolderAccessProtectedFolders = @("FakeStringValue")
+                    Id = "FakeStringValue"
+                    Name = "FakeStringValue"
                     Ensure = "Present"
                     Credential = $Credential;
                 }
@@ -152,71 +154,73 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                     attackSurfaceReductionRules = [CimInstance[]]@(
                         (New-CimInstance -ClassName MSFT_MicrosoftGraphAttackSurfaceReductionRules_Complex -Property @{
-                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair -Property @{
+                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair -Property @{
+                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair -Property @{
+                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair -Property @{
+                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableContentFromEmailClientAndWebmail = "off"
+                                value = "off"
                             } -ClientOnly)
-                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair -Property @{
+                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                useAdvancedProtectionAgainstRansomware = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair -Property @{
+                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair -Property @{
+                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair -Property @{
+                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair -Property @{
+                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockWin32APICallsFromOfficeMacros = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                             blockPersistenceThroughWMIEventSubscription = "off"
-                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair -Property @{
+                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAdobeReaderFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                         } -ClientOnly)
                     )
                     controlledFolderAccessAllowedApplications = @("FakeStringValue")
                     controlledFolderAccessProtectedFolders = @("FakeStringValue")
+                    Id = "FakeStringValue"
+                    Name = "FakeStringValue"
                     Ensure = 'Absent'
                     Credential = $Credential;
                 }
@@ -229,64 +233,64 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                                 @{
                                     blockProcessCreationsFromPSExecAndWMICommands = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                        value = "off"
                                     }
                                     blockOfficeCommunicationAppFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                     blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                        value = "off"
                                     }
                                     blockExecutionOfPotentiallyObfuscatedScripts = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                        value = "off"
                                     }
                                     blockExecutableContentFromEmailClientAndWebmail = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutableContentFromEmailClientAndWebmail = "off"
+                                        value = "off"
                                     }
                                     useAdvancedProtectionAgainstRansomware = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        useAdvancedProtectionAgainstRansomware = "off"
+                                        value = "off"
                                     }
                                     blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                        value = "off"
                                     }
                                     blockUntrustedUnsignedProcessesThatRunFromUSB = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                        value = "off"
                                     }
                                     blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                        value = "off"
                                     }
                                     blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                        value = "off"
                                     }
                                     blockOfficeApplicationsFromCreatingExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                        value = "off"
                                     }
                                     blockWin32APICallsFromOfficeMacros = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockWin32APICallsFromOfficeMacros = "off"
+                                        value = "off"
                                     }
                                     blockAllOfficeApplicationsFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                     blockPersistenceThroughWMIEventSubscription = "off"
                                     blockAbuseOfExploitedVulnerableSignedDrivers = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                        value = "off"
                                     }
                                     blockAdobeReaderFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAdobeReaderFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                 }
                             )
@@ -294,6 +298,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                             controlledFolderAccessAllowedApplications = @("FakeStringValue")
                         }
+                        Id = "FakeStringValue"
+                        Name = "FakeStringValue"
 
                     }
                 }
@@ -318,71 +324,73 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                     attackSurfaceReductionRules = [CimInstance[]]@(
                         (New-CimInstance -ClassName MSFT_MicrosoftGraphAttackSurfaceReductionRules_Complex -Property @{
-                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair -Property @{
+                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair -Property @{
+                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair -Property @{
+                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair -Property @{
+                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableContentFromEmailClientAndWebmail = "off"
+                                value = "off"
                             } -ClientOnly)
-                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair -Property @{
+                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                useAdvancedProtectionAgainstRansomware = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair -Property @{
+                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair -Property @{
+                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair -Property @{
+                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair -Property @{
+                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockWin32APICallsFromOfficeMacros = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                             blockPersistenceThroughWMIEventSubscription = "off"
-                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair -Property @{
+                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAdobeReaderFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                         } -ClientOnly)
                     )
                     controlledFolderAccessAllowedApplications = @("FakeStringValue")
                     controlledFolderAccessProtectedFolders = @("FakeStringValue")
+                    Id = "FakeStringValue"
+                    Name = "FakeStringValue"
                     Ensure = 'Present'
                     Credential = $Credential;
                 }
@@ -395,64 +403,64 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                                 @{
                                     blockProcessCreationsFromPSExecAndWMICommands = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                        value = "off"
                                     }
                                     blockOfficeCommunicationAppFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                     blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                        value = "off"
                                     }
                                     blockExecutionOfPotentiallyObfuscatedScripts = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                        value = "off"
                                     }
                                     blockExecutableContentFromEmailClientAndWebmail = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutableContentFromEmailClientAndWebmail = "off"
+                                        value = "off"
                                     }
                                     useAdvancedProtectionAgainstRansomware = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        useAdvancedProtectionAgainstRansomware = "off"
+                                        value = "off"
                                     }
                                     blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                        value = "off"
                                     }
                                     blockUntrustedUnsignedProcessesThatRunFromUSB = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                        value = "off"
                                     }
                                     blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                        value = "off"
                                     }
                                     blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                        value = "off"
                                     }
                                     blockOfficeApplicationsFromCreatingExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                        value = "off"
                                     }
                                     blockWin32APICallsFromOfficeMacros = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockWin32APICallsFromOfficeMacros = "off"
+                                        value = "off"
                                     }
                                     blockAllOfficeApplicationsFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                     blockPersistenceThroughWMIEventSubscription = "off"
                                     blockAbuseOfExploitedVulnerableSignedDrivers = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                        value = "off"
                                     }
                                     blockAdobeReaderFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAdobeReaderFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                 }
                             )
@@ -460,6 +468,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                             controlledFolderAccessAllowedApplications = @("FakeStringValue")
                         }
+                        Id = "FakeStringValue"
+                        Name = "FakeStringValue"
 
                     }
                 }
@@ -477,71 +487,73 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                     attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                     attackSurfaceReductionRules = [CimInstance[]]@(
                         (New-CimInstance -ClassName MSFT_MicrosoftGraphAttackSurfaceReductionRules_Complex -Property @{
-                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair -Property @{
+                            blockProcessCreationsFromPSExecAndWMICommands = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockOfficeCommunicationAppFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair -Property @{
+                            blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair -Property @{
+                            blockExecutionOfPotentiallyObfuscatedScripts = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair -Property @{
+                            blockExecutableContentFromEmailClientAndWebmail = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockExecutableContentFromEmailClientAndWebmail = "off"
+                                value = "off"
                             } -ClientOnly)
-                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair -Property @{
+                            useAdvancedProtectionAgainstRansomware = (New-CimInstance -ClassName MSFT_MicrosoftGraphUseAdvancedProtectionAgainstRansomware_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                useAdvancedProtectionAgainstRansomware = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair -Property @{
+                            blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair -Property @{
+                            blockUntrustedUnsignedProcessesThatRunFromUSB = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair -Property @{
+                            blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair -Property @{
+                            blockOfficeApplicationsFromCreatingExecutableContent = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair -Property @{
+                            blockWin32APICallsFromOfficeMacros = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockWin32APICallsFromOfficeMacros_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockWin32APICallsFromOfficeMacros = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAllOfficeApplicationsFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                             blockPersistenceThroughWMIEventSubscription = "off"
-                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair -Property @{
+                            blockAbuseOfExploitedVulnerableSignedDrivers = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                value = "off"
                             } -ClientOnly)
-                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair -Property @{
+                            blockAdobeReaderFromCreatingChildProcesses = (New-CimInstance -ClassName MSFT_MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_Complex -Property @{
                                 aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                blockAdobeReaderFromCreatingChildProcesses = "off"
+                                value = "off"
                             } -ClientOnly)
                         } -ClientOnly)
                     )
                     controlledFolderAccessAllowedApplications = @("FakeStringValue")
                     controlledFolderAccessProtectedFolders = @("FakeStringValue")
+                    Id = "FakeStringValue"
+                    Name = "FakeStringValue"
                     Ensure = 'Present'
                     Credential = $Credential;
                 }
@@ -554,64 +566,64 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                                 @{
                                     blockProcessCreationsFromPSExecAndWMICommands = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockProcessCreationsFromPSExecAndWMICommands = "block"
+                                        value = "block"
                                     }
                                     blockOfficeCommunicationAppFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockOfficeCommunicationAppFromCreatingChildProcesses = "block"
+                                        value = "block"
                                     }
                                     blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "block"
+                                        value = "block"
                                     }
                                     blockExecutionOfPotentiallyObfuscatedScripts = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockExecutionOfPotentiallyObfuscatedScripts = "block"
+                                        value = "block"
                                     }
                                     blockExecutableContentFromEmailClientAndWebmail = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockExecutableContentFromEmailClientAndWebmail = "block"
+                                        value = "block"
                                     }
                                     useAdvancedProtectionAgainstRansomware = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        useAdvancedProtectionAgainstRansomware = "block"
+                                        value = "block"
                                     }
                                     blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "block"
+                                        value = "block"
                                     }
                                     blockUntrustedUnsignedProcessesThatRunFromUSB = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockUntrustedUnsignedProcessesThatRunFromUSB = "block"
+                                        value = "block"
                                     }
                                     blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "block"
+                                        value = "block"
                                     }
                                     blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "block"
+                                        value = "block"
                                     }
                                     blockOfficeApplicationsFromCreatingExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockOfficeApplicationsFromCreatingExecutableContent = "block"
+                                        value = "block"
                                     }
                                     blockWin32APICallsFromOfficeMacros = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockWin32APICallsFromOfficeMacros = "block"
+                                        value = "block"
                                     }
                                     blockAllOfficeApplicationsFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockAllOfficeApplicationsFromCreatingChildProcesses = "block"
+                                        value = "block"
                                     }
                                     blockPersistenceThroughWMIEventSubscription = "block"
                                     blockAbuseOfExploitedVulnerableSignedDrivers = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockAbuseOfExploitedVulnerableSignedDrivers = "block"
+                                        value = "block"
                                     }
                                     blockAdobeReaderFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValueDrift")
-                                        blockAdobeReaderFromCreatingChildProcesses = "block"
+                                        value = "block"
                                     }
                                 }
                             )
@@ -619,6 +631,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             enableControlledFolderAccess = 1
                             controlledFolderAccessAllowedApplications = @("FakeStringValueDrift")
                         }
+                        Id = "FakeStringValueDrift"
+                        Name = "FakeStringValueDrift"
                     }
                 }
             }
@@ -653,64 +667,64 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                                 @{
                                     blockProcessCreationsFromPSExecAndWMICommands = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockProcessCreationsFromPSExecAndWMICommands = "off"
+                                        value = "off"
                                     }
                                     blockOfficeCommunicationAppFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeCommunicationAppFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                     blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = "off"
+                                        value = "off"
                                     }
                                     blockExecutionOfPotentiallyObfuscatedScripts = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutionOfPotentiallyObfuscatedScripts = "off"
+                                        value = "off"
                                     }
                                     blockExecutableContentFromEmailClientAndWebmail = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockExecutableContentFromEmailClientAndWebmail = "off"
+                                        value = "off"
                                     }
                                     useAdvancedProtectionAgainstRansomware = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        useAdvancedProtectionAgainstRansomware = "off"
+                                        value = "off"
                                     }
                                     blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = "off"
+                                        value = "off"
                                     }
                                     blockUntrustedUnsignedProcessesThatRunFromUSB = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockUntrustedUnsignedProcessesThatRunFromUSB = "off"
+                                        value = "off"
                                     }
                                     blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = "off"
+                                        value = "off"
                                     }
                                     blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = "off"
+                                        value = "off"
                                     }
                                     blockOfficeApplicationsFromCreatingExecutableContent = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockOfficeApplicationsFromCreatingExecutableContent = "off"
+                                        value = "off"
                                     }
                                     blockWin32APICallsFromOfficeMacros = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockWin32APICallsFromOfficeMacros = "off"
+                                        value = "off"
                                     }
                                     blockAllOfficeApplicationsFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAllOfficeApplicationsFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                     blockPersistenceThroughWMIEventSubscription = "off"
                                     blockAbuseOfExploitedVulnerableSignedDrivers = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAbuseOfExploitedVulnerableSignedDrivers = "off"
+                                        value = "off"
                                     }
                                     blockAdobeReaderFromCreatingChildProcesses = @{
                                         aSROnlyPerRuleExclusions = @("FakeStringValue")
-                                        blockAdobeReaderFromCreatingChildProcesses = "off"
+                                        value = "off"
                                     }
                                 }
                             )
@@ -718,6 +732,8 @@ Describe -Name $Global:DscHelper.DescribeHeader -Fixture {
                             attackSurfaceReductionOnlyExclusions = @("FakeStringValue")
                             controlledFolderAccessAllowedApplications = @("FakeStringValue")
                         }
+                        Id = "FakeStringValue"
+                        Name = "FakeStringValue"
 
                     }
                 }

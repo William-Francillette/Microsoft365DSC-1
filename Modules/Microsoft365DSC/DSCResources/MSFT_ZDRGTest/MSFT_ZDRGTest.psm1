@@ -5,6 +5,14 @@ function Get-TargetResource
     param
     (
         #region resource generator code
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $AttackSurfaceReductionRules,
@@ -84,7 +92,7 @@ function Get-TargetResource
 
         $getValue = $null
         #region resource generator code
-        $getValue = Get-MgDeviceManagementConfigurationPolicy -DeviceManagementConfigurationPolicyId $Id  -ErrorAction SilentlyContinue
+        $getValue = Get-MgDeviceManagementConfigurationPolicy -DeviceManagementConfigurationPolicyId $Id  -expandProperty "settings" -ErrorAction SilentlyContinue
 
         if ($null -eq $getValue)
         {
@@ -111,202 +119,147 @@ function Get-TargetResource
         Write-Verbose -Message "An Z D R G Test with Id {$Id} and Name {$Name} was found."
 
         #region resource generator code
-        $complexAttackSurfaceReductionRules = @()
-        foreach ($currentattackSurfaceReductionRules in $getValue.AdditionalProperties.attackSurfaceReductionRules)
-        {
-            $myattackSurfaceReductionRules = @{}
-            $complexBlockAdobeReaderFromCreatingChildProcesses = @{}
-            $complexBlockAdobeReaderFromCreatingChildProcesses.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockAdobeReaderFromCreatingChildProcesses.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockAdobeReaderFromCreatingChildProcesses.blockAdobeReaderFromCreatingChildProcesses)
-            {
-                $complexBlockAdobeReaderFromCreatingChildProcesses.Add('BlockAdobeReaderFromCreatingChildProcesses', $currentattackSurfaceReductionRules.blockAdobeReaderFromCreatingChildProcesses.blockAdobeReaderFromCreatingChildProcesses.toString())
-            }
-            if ($complexBlockAdobeReaderFromCreatingChildProcesses.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockAdobeReaderFromCreatingChildProcesses = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockAdobeReaderFromCreatingChildProcesses',$complexBlockAdobeReaderFromCreatingChildProcesses)
-            $complexBlockExecutionOfPotentiallyObfuscatedScripts = @{}
-            $complexBlockExecutionOfPotentiallyObfuscatedScripts.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockExecutionOfPotentiallyObfuscatedScripts.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockExecutionOfPotentiallyObfuscatedScripts.blockExecutionOfPotentiallyObfuscatedScripts)
-            {
-                $complexBlockExecutionOfPotentiallyObfuscatedScripts.Add('BlockExecutionOfPotentiallyObfuscatedScripts', $currentattackSurfaceReductionRules.blockExecutionOfPotentiallyObfuscatedScripts.blockExecutionOfPotentiallyObfuscatedScripts.toString())
-            }
-            if ($complexBlockExecutionOfPotentiallyObfuscatedScripts.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockExecutionOfPotentiallyObfuscatedScripts = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockExecutionOfPotentiallyObfuscatedScripts',$complexBlockExecutionOfPotentiallyObfuscatedScripts)
-            $complexBlockWin32APICallsFromOfficeMacros = @{}
-            $complexBlockWin32APICallsFromOfficeMacros.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockWin32APICallsFromOfficeMacros.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockWin32APICallsFromOfficeMacros.blockWin32APICallsFromOfficeMacros)
-            {
-                $complexBlockWin32APICallsFromOfficeMacros.Add('BlockWin32APICallsFromOfficeMacros', $currentattackSurfaceReductionRules.blockWin32APICallsFromOfficeMacros.blockWin32APICallsFromOfficeMacros.toString())
-            }
-            if ($complexBlockWin32APICallsFromOfficeMacros.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockWin32APICallsFromOfficeMacros = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockWin32APICallsFromOfficeMacros',$complexBlockWin32APICallsFromOfficeMacros)
-            $complexBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = @{}
-            $complexBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem)
-            {
-                $complexBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.Add('BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem', $currentattackSurfaceReductionRules.blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.blockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.toString())
-            }
-            if ($complexBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem',$complexBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem)
-            $complexBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = @{}
-            $complexBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion)
-            {
-                $complexBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.Add('BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion', $currentattackSurfaceReductionRules.blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.blockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.toString())
-            }
-            if ($complexBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion',$complexBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion)
-            $complexBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = @{}
-            $complexBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent)
-            {
-                $complexBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.Add('BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent', $currentattackSurfaceReductionRules.blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.blockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.toString())
-            }
-            if ($complexBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent',$complexBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent)
-            $complexBlockOfficeCommunicationAppFromCreatingChildProcesses = @{}
-            $complexBlockOfficeCommunicationAppFromCreatingChildProcesses.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockOfficeCommunicationAppFromCreatingChildProcesses.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockOfficeCommunicationAppFromCreatingChildProcesses.blockOfficeCommunicationAppFromCreatingChildProcesses)
-            {
-                $complexBlockOfficeCommunicationAppFromCreatingChildProcesses.Add('BlockOfficeCommunicationAppFromCreatingChildProcesses', $currentattackSurfaceReductionRules.blockOfficeCommunicationAppFromCreatingChildProcesses.blockOfficeCommunicationAppFromCreatingChildProcesses.toString())
-            }
-            if ($complexBlockOfficeCommunicationAppFromCreatingChildProcesses.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockOfficeCommunicationAppFromCreatingChildProcesses = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockOfficeCommunicationAppFromCreatingChildProcesses',$complexBlockOfficeCommunicationAppFromCreatingChildProcesses)
-            $complexBlockAllOfficeApplicationsFromCreatingChildProcesses = @{}
-            $complexBlockAllOfficeApplicationsFromCreatingChildProcesses.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockAllOfficeApplicationsFromCreatingChildProcesses.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockAllOfficeApplicationsFromCreatingChildProcesses.blockAllOfficeApplicationsFromCreatingChildProcesses)
-            {
-                $complexBlockAllOfficeApplicationsFromCreatingChildProcesses.Add('BlockAllOfficeApplicationsFromCreatingChildProcesses', $currentattackSurfaceReductionRules.blockAllOfficeApplicationsFromCreatingChildProcesses.blockAllOfficeApplicationsFromCreatingChildProcesses.toString())
-            }
-            if ($complexBlockAllOfficeApplicationsFromCreatingChildProcesses.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockAllOfficeApplicationsFromCreatingChildProcesses = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockAllOfficeApplicationsFromCreatingChildProcesses',$complexBlockAllOfficeApplicationsFromCreatingChildProcesses)
-            $complexBlockUntrustedUnsignedProcessesThatRunFromUSB = @{}
-            $complexBlockUntrustedUnsignedProcessesThatRunFromUSB.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockUntrustedUnsignedProcessesThatRunFromUSB.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockUntrustedUnsignedProcessesThatRunFromUSB.blockUntrustedUnsignedProcessesThatRunFromUSB)
-            {
-                $complexBlockUntrustedUnsignedProcessesThatRunFromUSB.Add('BlockUntrustedUnsignedProcessesThatRunFromUSB', $currentattackSurfaceReductionRules.blockUntrustedUnsignedProcessesThatRunFromUSB.blockUntrustedUnsignedProcessesThatRunFromUSB.toString())
-            }
-            if ($complexBlockUntrustedUnsignedProcessesThatRunFromUSB.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockUntrustedUnsignedProcessesThatRunFromUSB = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockUntrustedUnsignedProcessesThatRunFromUSB',$complexBlockUntrustedUnsignedProcessesThatRunFromUSB)
-            $complexBlockProcessCreationsFromPSExecAndWMICommands = @{}
-            $complexBlockProcessCreationsFromPSExecAndWMICommands.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockProcessCreationsFromPSExecAndWMICommands.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockProcessCreationsFromPSExecAndWMICommands.blockProcessCreationsFromPSExecAndWMICommands)
-            {
-                $complexBlockProcessCreationsFromPSExecAndWMICommands.Add('BlockProcessCreationsFromPSExecAndWMICommands', $currentattackSurfaceReductionRules.blockProcessCreationsFromPSExecAndWMICommands.blockProcessCreationsFromPSExecAndWMICommands.toString())
-            }
-            if ($complexBlockProcessCreationsFromPSExecAndWMICommands.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockProcessCreationsFromPSExecAndWMICommands = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockProcessCreationsFromPSExecAndWMICommands',$complexBlockProcessCreationsFromPSExecAndWMICommands)
-            if ($null -ne $currentattackSurfaceReductionRules.blockPersistenceThroughWMIEventSubscription)
-            {
-                $myattackSurfaceReductionRules.Add('BlockPersistenceThroughWMIEventSubscription', $currentattackSurfaceReductionRules.blockPersistenceThroughWMIEventSubscription.toString())
-            }
-            $complexBlockOfficeApplicationsFromCreatingExecutableContent = @{}
-            $complexBlockOfficeApplicationsFromCreatingExecutableContent.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockOfficeApplicationsFromCreatingExecutableContent.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockOfficeApplicationsFromCreatingExecutableContent.blockOfficeApplicationsFromCreatingExecutableContent)
-            {
-                $complexBlockOfficeApplicationsFromCreatingExecutableContent.Add('BlockOfficeApplicationsFromCreatingExecutableContent', $currentattackSurfaceReductionRules.blockOfficeApplicationsFromCreatingExecutableContent.blockOfficeApplicationsFromCreatingExecutableContent.toString())
-            }
-            if ($complexBlockOfficeApplicationsFromCreatingExecutableContent.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockOfficeApplicationsFromCreatingExecutableContent = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockOfficeApplicationsFromCreatingExecutableContent',$complexBlockOfficeApplicationsFromCreatingExecutableContent)
-            $complexBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = @{}
-            $complexBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses)
-            {
-                $complexBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.Add('BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses', $currentattackSurfaceReductionRules.blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.blockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.toString())
-            }
-            if ($complexBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses',$complexBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses)
-            $complexUseAdvancedProtectionAgainstRansomware = @{}
-            $complexUseAdvancedProtectionAgainstRansomware.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.useAdvancedProtectionAgainstRansomware.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.useAdvancedProtectionAgainstRansomware.useAdvancedProtectionAgainstRansomware)
-            {
-                $complexUseAdvancedProtectionAgainstRansomware.Add('UseAdvancedProtectionAgainstRansomware', $currentattackSurfaceReductionRules.useAdvancedProtectionAgainstRansomware.useAdvancedProtectionAgainstRansomware.toString())
-            }
-            if ($complexUseAdvancedProtectionAgainstRansomware.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexUseAdvancedProtectionAgainstRansomware = $null
-            }
-            $myattackSurfaceReductionRules.Add('UseAdvancedProtectionAgainstRansomware',$complexUseAdvancedProtectionAgainstRansomware)
-            $complexBlockExecutableContentFromEmailClientAndWebmail = @{}
-            $complexBlockExecutableContentFromEmailClientAndWebmail.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockExecutableContentFromEmailClientAndWebmail.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockExecutableContentFromEmailClientAndWebmail.blockExecutableContentFromEmailClientAndWebmail)
-            {
-                $complexBlockExecutableContentFromEmailClientAndWebmail.Add('BlockExecutableContentFromEmailClientAndWebmail', $currentattackSurfaceReductionRules.blockExecutableContentFromEmailClientAndWebmail.blockExecutableContentFromEmailClientAndWebmail.toString())
-            }
-            if ($complexBlockExecutableContentFromEmailClientAndWebmail.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockExecutableContentFromEmailClientAndWebmail = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockExecutableContentFromEmailClientAndWebmail',$complexBlockExecutableContentFromEmailClientAndWebmail)
-            $complexBlockAbuseOfExploitedVulnerableSignedDrivers = @{}
-            $complexBlockAbuseOfExploitedVulnerableSignedDrivers.Add('ASROnlyPerRuleExclusions', $currentattackSurfaceReductionRules.blockAbuseOfExploitedVulnerableSignedDrivers.aSROnlyPerRuleExclusions)
-            if ($null -ne $currentattackSurfaceReductionRules.blockAbuseOfExploitedVulnerableSignedDrivers.blockAbuseOfExploitedVulnerableSignedDrivers)
-            {
-                $complexBlockAbuseOfExploitedVulnerableSignedDrivers.Add('BlockAbuseOfExploitedVulnerableSignedDrivers', $currentattackSurfaceReductionRules.blockAbuseOfExploitedVulnerableSignedDrivers.blockAbuseOfExploitedVulnerableSignedDrivers.toString())
-            }
-            if ($complexBlockAbuseOfExploitedVulnerableSignedDrivers.values.Where({$null -ne $_}).count -eq 0)
-            {
-                $complexBlockAbuseOfExploitedVulnerableSignedDrivers = $null
-            }
-            $myattackSurfaceReductionRules.Add('BlockAbuseOfExploitedVulnerableSignedDrivers',$complexBlockAbuseOfExploitedVulnerableSignedDrivers)
-            if ($myattackSurfaceReductionRules.values.Where({$null -ne $_}).count -gt 0)
-            {
-                $complexAttackSurfaceReductionRules += $myattackSurfaceReductionRules
-            }
-        }
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq ''}
+        $simpleId = $setting.AdditionalProperties.system.String.value
 
-        #endregion
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq ''}
+        $simpleName = $setting.AdditionalProperties.system.String.value
 
-        #region resource generator code
-        $enumEnableControlledFolderAccess = $null
-        if ($null -ne $getValue.AdditionalProperties.enableControlledFolderAccess)
-        {
-            $enumEnableControlledFolderAccess = $getValue.AdditionalProperties.enableControlledFolderAccess.ToString()
-        }
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules'}
+        $childAttackSurfaceReductionRules = $setting.AdditionalProperties.groupSettingCollectionValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules'}
+        $complexAttackSurfaceReductionRules = @{}
+        $childBlockAdobeReaderFromCreatingChildProcesses = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockadobereaderfromcreatingchildprocesses'}
+        $hashBlockAdobeReaderFromCreatingChildProcesses = @{}
+        $hashBlockAdobeReaderFromCreatingChildProcesses.Add('ASROnlyPerRuleExclusions',$childBlockAdobeReaderFromCreatingChildProcesses.simpleSettingCollectionValue.value)
+
+        $hashBlockAdobeReaderFromCreatingChildProcesses.Add('Value',$childBlockAdobeReaderFromCreatingChildProcesses.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockAdobeReaderFromCreatingChildProcesses',$hashBlockAdobeReaderFromCreatingChildProcesses)
+
+        $childBlockExecutionOfPotentiallyObfuscatedScripts = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutionofpotentiallyobfuscatedscripts'}
+        $hashBlockExecutionOfPotentiallyObfuscatedScripts = @{}
+        $hashBlockExecutionOfPotentiallyObfuscatedScripts.Add('ASROnlyPerRuleExclusions',$childBlockExecutionOfPotentiallyObfuscatedScripts.simpleSettingCollectionValue.value)
+
+        $hashBlockExecutionOfPotentiallyObfuscatedScripts.Add('Value',$childBlockExecutionOfPotentiallyObfuscatedScripts.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockExecutionOfPotentiallyObfuscatedScripts',$hashBlockExecutionOfPotentiallyObfuscatedScripts)
+
+        $childBlockWin32APICallsFromOfficeMacros = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockwin32apicallsfromofficemacros'}
+        $hashBlockWin32APICallsFromOfficeMacros = @{}
+        $hashBlockWin32APICallsFromOfficeMacros.Add('ASROnlyPerRuleExclusions',$childBlockWin32APICallsFromOfficeMacros.simpleSettingCollectionValue.value)
+
+        $hashBlockWin32APICallsFromOfficeMacros.Add('Value',$childBlockWin32APICallsFromOfficeMacros.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockWin32APICallsFromOfficeMacros',$hashBlockWin32APICallsFromOfficeMacros)
+
+        $childBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockcredentialstealingfromwindowslocalsecurityauthoritysubsystem'}
+        $hashBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem = @{}
+        $hashBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.Add('ASROnlyPerRuleExclusions',$childBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.simpleSettingCollectionValue.value)
+
+        $hashBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.Add('Value',$childBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem',$hashBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem)
+
+        $childBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablefilesrunningunlesstheymeetprevalenceagetrustedlistcriterion'}
+        $hashBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion = @{}
+        $hashBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.Add('ASROnlyPerRuleExclusions',$childBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.simpleSettingCollectionValue.value)
+
+        $hashBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.Add('Value',$childBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion',$hashBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion)
+
+        $childBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockjavascriptorvbscriptfromlaunchingdownloadedexecutablecontent'}
+        $hashBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent = @{}
+        $hashBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.Add('ASROnlyPerRuleExclusions',$childBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.simpleSettingCollectionValue.value)
+
+        $hashBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.Add('Value',$childBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent',$hashBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent)
+
+        $childBlockOfficeCommunicationAppFromCreatingChildProcesses = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficecommunicationappfromcreatingchildprocesses'}
+        $hashBlockOfficeCommunicationAppFromCreatingChildProcesses = @{}
+        $hashBlockOfficeCommunicationAppFromCreatingChildProcesses.Add('ASROnlyPerRuleExclusions',$childBlockOfficeCommunicationAppFromCreatingChildProcesses.simpleSettingCollectionValue.value)
+
+        $hashBlockOfficeCommunicationAppFromCreatingChildProcesses.Add('Value',$childBlockOfficeCommunicationAppFromCreatingChildProcesses.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockOfficeCommunicationAppFromCreatingChildProcesses',$hashBlockOfficeCommunicationAppFromCreatingChildProcesses)
+
+        $childBlockAllOfficeApplicationsFromCreatingChildProcesses = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockallofficeapplicationsfromcreatingchildprocesses'}
+        $hashBlockAllOfficeApplicationsFromCreatingChildProcesses = @{}
+        $hashBlockAllOfficeApplicationsFromCreatingChildProcesses.Add('ASROnlyPerRuleExclusions',$childBlockAllOfficeApplicationsFromCreatingChildProcesses.simpleSettingCollectionValue.value)
+
+        $hashBlockAllOfficeApplicationsFromCreatingChildProcesses.Add('Value',$childBlockAllOfficeApplicationsFromCreatingChildProcesses.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockAllOfficeApplicationsFromCreatingChildProcesses',$hashBlockAllOfficeApplicationsFromCreatingChildProcesses)
+
+        $childBlockUntrustedUnsignedProcessesThatRunFromUSB = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockuntrustedunsignedprocessesthatrunfromusb'}
+        $hashBlockUntrustedUnsignedProcessesThatRunFromUSB = @{}
+        $hashBlockUntrustedUnsignedProcessesThatRunFromUSB.Add('ASROnlyPerRuleExclusions',$childBlockUntrustedUnsignedProcessesThatRunFromUSB.simpleSettingCollectionValue.value)
+
+        $hashBlockUntrustedUnsignedProcessesThatRunFromUSB.Add('Value',$childBlockUntrustedUnsignedProcessesThatRunFromUSB.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockUntrustedUnsignedProcessesThatRunFromUSB',$hashBlockUntrustedUnsignedProcessesThatRunFromUSB)
+
+        $childBlockProcessCreationsFromPSExecAndWMICommands = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockprocesscreationsfrompsexecandwmicommands'}
+        $hashBlockProcessCreationsFromPSExecAndWMICommands = @{}
+        $hashBlockProcessCreationsFromPSExecAndWMICommands.Add('ASROnlyPerRuleExclusions',$childBlockProcessCreationsFromPSExecAndWMICommands.simpleSettingCollectionValue.value)
+
+        $hashBlockProcessCreationsFromPSExecAndWMICommands.Add('Value',$childBlockProcessCreationsFromPSExecAndWMICommands.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockProcessCreationsFromPSExecAndWMICommands',$hashBlockProcessCreationsFromPSExecAndWMICommands)
+
+        $complexAttackSurfaceReductionRules.Add('BlockPersistenceThroughWMIEventSubscription',$childAttackSurfaceReductionRules.choiceSettingValue.value)
+
+        $childBlockOfficeApplicationsFromCreatingExecutableContent = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfromcreatingexecutablecontent'}
+        $hashBlockOfficeApplicationsFromCreatingExecutableContent = @{}
+        $hashBlockOfficeApplicationsFromCreatingExecutableContent.Add('ASROnlyPerRuleExclusions',$childBlockOfficeApplicationsFromCreatingExecutableContent.simpleSettingCollectionValue.value)
+
+        $hashBlockOfficeApplicationsFromCreatingExecutableContent.Add('Value',$childBlockOfficeApplicationsFromCreatingExecutableContent.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockOfficeApplicationsFromCreatingExecutableContent',$hashBlockOfficeApplicationsFromCreatingExecutableContent)
+
+        $childBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockofficeapplicationsfrominjectingcodeintootherprocesses'}
+        $hashBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses = @{}
+        $hashBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.Add('ASROnlyPerRuleExclusions',$childBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.simpleSettingCollectionValue.value)
+
+        $hashBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.Add('Value',$childBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses',$hashBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses)
+
+        $childUseAdvancedProtectionAgainstRansomware = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_useadvancedprotectionagainstransomware'}
+        $hashUseAdvancedProtectionAgainstRansomware = @{}
+        $hashUseAdvancedProtectionAgainstRansomware.Add('ASROnlyPerRuleExclusions',$childUseAdvancedProtectionAgainstRansomware.simpleSettingCollectionValue.value)
+
+        $hashUseAdvancedProtectionAgainstRansomware.Add('Value',$childUseAdvancedProtectionAgainstRansomware.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('UseAdvancedProtectionAgainstRansomware',$hashUseAdvancedProtectionAgainstRansomware)
+
+        $childBlockExecutableContentFromEmailClientAndWebmail = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockexecutablecontentfromemailclientandwebmail'}
+        $hashBlockExecutableContentFromEmailClientAndWebmail = @{}
+        $hashBlockExecutableContentFromEmailClientAndWebmail.Add('ASROnlyPerRuleExclusions',$childBlockExecutableContentFromEmailClientAndWebmail.simpleSettingCollectionValue.value)
+
+        $hashBlockExecutableContentFromEmailClientAndWebmail.Add('Value',$childBlockExecutableContentFromEmailClientAndWebmail.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockExecutableContentFromEmailClientAndWebmail',$hashBlockExecutableContentFromEmailClientAndWebmail)
+
+        $childBlockAbuseOfExploitedVulnerableSignedDrivers = $childAttackSurfaceReductionRules.choiceSettingValue.children | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductionrules_blockabuseofexploitedvulnerablesigneddrivers'}
+        $hashBlockAbuseOfExploitedVulnerableSignedDrivers = @{}
+        $hashBlockAbuseOfExploitedVulnerableSignedDrivers.Add('ASROnlyPerRuleExclusions',$childBlockAbuseOfExploitedVulnerableSignedDrivers.simpleSettingCollectionValue.value)
+
+        $hashBlockAbuseOfExploitedVulnerableSignedDrivers.Add('Value',$childBlockAbuseOfExploitedVulnerableSignedDrivers.choiceSettingValue.value)
+        $complexAttackSurfaceReductionRules.Add('BlockAbuseOfExploitedVulnerableSignedDrivers',$hashBlockAbuseOfExploitedVulnerableSignedDrivers)
+
+        $complexAttackSurfaceReductionRules.Add('Value',$childAttackSurfaceReductionRules.groupSettingCollectionValue.value)
+        $AttackSurfaceReductionRules = $hashAttackSurfaceReductionRules
+
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_attacksurfacereductiononlyexclusions'}
+        $simpleAttackSurfaceReductionOnlyExclusions = $setting.AdditionalProperties.simpleSettingCollectionValue.value
+
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_enablecontrolledfolderaccess'}
+        $simpleEnableControlledFolderAccess = $setting.AdditionalProperties.choiceSettingValue.value
+
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_controlledfolderaccessprotectedfolders'}
+        $simpleControlledFolderAccessProtectedFolders = $setting.AdditionalProperties.simpleSettingCollectionValue.value
+
+        $setting = $getValue.settings.SettingInstance | Where-Object {$_.settingDefinitionId -eq 'device_vendor_msft_policy_config_defender_controlledfolderaccessallowedapplications'}
+        $simpleControlledFolderAccessAllowedApplications = $setting.AdditionalProperties.simpleSettingCollectionValue.value
         #endregion
 
         $results = @{
             #region resource generator code
+            Id                                        = $getValue.Id
+            Name                                      = $getValue.Name
             AttackSurfaceReductionRules               = $complexAttackSurfaceReductionRules
-            AttackSurfaceReductionOnlyExclusions      = $getValue.AdditionalProperties.attackSurfaceReductionOnlyExclusions
-            EnableControlledFolderAccess              = $enumEnableControlledFolderAccess
-            ControlledFolderAccessProtectedFolders    = $getValue.AdditionalProperties.controlledFolderAccessProtectedFolders
-            ControlledFolderAccessAllowedApplications = $getValue.AdditionalProperties.controlledFolderAccessAllowedApplications
+            AttackSurfaceReductionOnlyExclusions      = $simpleAttackSurfaceReductionOnlyExclusions
+            EnableControlledFolderAccess              = $simpleEnableControlledFolderAccess
+            ControlledFolderAccessProtectedFolders    = $simpleControlledFolderAccessProtectedFolders
+            ControlledFolderAccessAllowedApplications = $simpleControlledFolderAccessAllowedApplications
             Ensure                                    = 'Present'
             Credential                                = $Credential
             ApplicationId                             = $ApplicationId
@@ -351,6 +304,14 @@ function Set-TargetResource
     param
     (
         #region resource generator code
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $AttackSurfaceReductionRules,
@@ -506,6 +467,14 @@ function Test-TargetResource
     param
     (
         #region resource generator code
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Id,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $Name,
+
         [Parameter()]
         [Microsoft.Management.Infrastructure.CimInstance[]]
         $AttackSurfaceReductionRules,
@@ -729,77 +698,77 @@ function Export-TargetResource
                     }
                     @{
                         Name = 'BlockAdobeReaderFromCreatingChildProcesses'
-                        CimInstanceName = 'MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockAdobeReaderFromCreatingChildProcesses_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockExecutionOfPotentiallyObfuscatedScripts'
-                        CimInstanceName = 'MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockExecutionOfPotentiallyObfuscatedScripts_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockWin32APICallsFromOfficeMacros'
-                        CimInstanceName = 'MicrosoftGraphBlockWin32APICallsFromOfficeMacros_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockWin32APICallsFromOfficeMacros_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem'
-                        CimInstanceName = 'MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockCredentialStealingFromWindowsLocalSecurityAuthoritySubsystem_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion'
-                        CimInstanceName = 'MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockExecutableFilesRunningUnlessTheyMeetPrevalenceAgeTrustedListCriterion_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent'
-                        CimInstanceName = 'MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockJavaScriptOrVBScriptFromLaunchingDownloadedExecutableContent_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockOfficeCommunicationAppFromCreatingChildProcesses'
-                        CimInstanceName = 'MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockOfficeCommunicationAppFromCreatingChildProcesses_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockAllOfficeApplicationsFromCreatingChildProcesses'
-                        CimInstanceName = 'MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockAllOfficeApplicationsFromCreatingChildProcesses_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockUntrustedUnsignedProcessesThatRunFromUSB'
-                        CimInstanceName = 'MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockUntrustedUnsignedProcessesThatRunFromUSB_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockProcessCreationsFromPSExecAndWMICommands'
-                        CimInstanceName = 'MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockProcessCreationsFromPSExecAndWMICommands_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockOfficeApplicationsFromCreatingExecutableContent'
-                        CimInstanceName = 'MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockOfficeApplicationsFromCreatingExecutableContent_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses'
-                        CimInstanceName = 'MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockOfficeApplicationsFromInjectingCodeIntoOtherProcesses_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'UseAdvancedProtectionAgainstRansomware'
-                        CimInstanceName = 'MicrosoftGraphUseAdvancedProtectionAgainstRansomware_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphUseAdvancedProtectionAgainstRansomware_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockExecutableContentFromEmailClientAndWebmail'
-                        CimInstanceName = 'MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockExecutableContentFromEmailClientAndWebmail_Complex'
                         IsRequired = $False
                     }
                     @{
                         Name = 'BlockAbuseOfExploitedVulnerableSignedDrivers'
-                        CimInstanceName = 'MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_KeyValuePair'
+                        CimInstanceName = 'MicrosoftGraphBlockAbuseOfExploitedVulnerableSignedDrivers_Complex'
                         IsRequired = $False
                     }
                 )
@@ -843,9 +812,7 @@ function Export-TargetResource
                 $currentDSCBlock = Convert-DSCStringParamToVariable -DSCBlock $currentDSCBlock -ParameterName "Assignments" -isCIMArray:$true
             }
             #removing trailing commas and semi colons between items of an array of cim instances added by Convert-DSCStringParamToVariable
-            $currentDSCBlock = $currentDSCBlock.replace("    ,`r`n" , "    `r`n" )
-            $currentDSCBlock = $currentDSCBlock.replace("`r`n;`r`n" , "`r`n" )
-            $currentDSCBlock = $currentDSCBlock.replace("`r`n,`r`n" , "`r`n" )
+            $currentDSCBlock = Remove-M365DSCCimInstanceTrailingCharacterFromExport -DSCBlock $currentDSCBlock
             $dscContent += $currentDSCBlock
             Save-M365DSCPartialExport -Content $currentDSCBlock `
                 -FileName $Global:PartialExportFileName

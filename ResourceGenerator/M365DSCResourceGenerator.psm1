@@ -377,6 +377,10 @@ function New-M365DSCResource
             $navigationProperties = ($parameterInformation | Where-Object {$_.IsNavigationProperty}).name
             $expandIdentifier = " -expandProperty `"$($navigationProperties -join ',')`""
         }
+        elseif ( $CmdLetNoun -eq 'MgDeviceManagementConfigurationPolicy')
+        {
+            $expandIdentifier = " -expandProperty ""settings"""
+        }
         $getDefaultParameterSet = $getCmdlet.ParameterSets | Where-Object -FilterScript { $_.Name -eq 'List' }
         $getListIdentifier =$getDefaultParameterSet.Parameters.Name
         $getAlternativeFilterString = [System.Text.StringBuilder]::New()
@@ -432,10 +436,10 @@ function New-M365DSCResource
         {
             $complexTypeConstructor = $hashtableResults.ComplexTypeConstructor
             $complexTypeConstructor = "`r`n        #region resource generator code`r`n" + $complexTypeConstructor
-            if ($CmdLetNoun -ne 'MgDeviceManagementConfigurationPolicy')
-            {
+            #if ($CmdLetNoun -ne 'MgDeviceManagementConfigurationPolicy')
+            #{
                 $complexTypeConstructor = $complexTypeConstructor.Substring(0, $complexTypeConstructor.Length -2)
-            }
+            #}
             $complexTypeConstructor = $complexTypeConstructor + "        #endregion`r`n"
         }
         Write-TokenReplacement -Token '<ComplexTypeConstructor>' -Value $complexTypeConstructor -FilePath $moduleFilePath
@@ -1674,7 +1678,7 @@ function Get-IntuneSettingCatalogSettingDefinition
     $property.Add('IsArray',$($settingType -like '*Collection*'))
     $property.Add('IsEnumType', $($settingType -like '*Choice*'))
     $property.Add('IsComplexType', $($null -ne $property.properties -and $property.properties.count -gt 0))
-    if($property.properties.count -eq 1)
+    <#if($property.properties.count -eq 1)
     {
         $clone = $property.clone()
         $property.remove('Members')
@@ -1682,6 +1686,21 @@ function Get-IntuneSettingCatalogSettingDefinition
         $property.DerivedType = "$($property.Name)_KeyValuePair"
         $clone.IsComplexType = $false
         $clone.Properties = @()
+        #$clone.name = $clone.name + '_value'
+        $clone.name = 'value'
+        $clone.description = "Value of $($property.name)"
+        $property.properties += $clone
+    }#>
+    if($property.IsComplexType -and $property.properties.count -eq 1)
+    {
+        $clone = $property.clone()
+        #$property.remove('Members')
+        #$property.IsEnumType = $false
+        $property.DerivedType = "$($property.Name)_Complex"
+        $clone.IsComplexType = $false
+        #$clone.Properties = @()
+        $clone.name = 'value'
+        $clone.description = "Value of $($property.name)"
         $property.properties += $clone
     }
 
@@ -1700,6 +1719,33 @@ function Get-IntuneSettingCatalogProperty
     )
 
     $properties=@()
+
+    $id = @{
+        'Name' = 'Id'
+        'Type' = 'System.String'
+        'IsRootProperty' = $true
+        'DerivedType' = 'System.String'
+        'Description' = 'Id of the policy'
+        'IsArray' = $false
+        'IsEnumType' = $false
+        'IsComplexType' = $false
+        'IsAbstract' = $false
+    }
+    $properties += $id
+
+    $displayName = @{
+        'Name' = 'Name'
+        'Type' = 'System.String'
+        'IsRootProperty' = $true
+        'DerivedType' = 'System.String'
+        'Description' = 'Name of the policy'
+        'IsArray' = $false
+        'IsEnumType' = $false
+        'IsComplexType' = $false
+        'IsAbstract' = $false
+    }
+    $properties += $displayName
+
     $templateSettings = Get-MgDeviceManagementConfigurationPolicyTemplateSettingTemplate `
         -DeviceManagementConfigurationPolicyTemplateId $TemplateId `
         -ExpandProperty 'settingDefinitions'
@@ -2315,7 +2361,9 @@ function Get-ParameterBlockInformation
             IsMandatory                 = $isMandatory
             Attribute                   = $parameterAttribute
             Type                        = $property.DerivedType
+            OriginalType                = $property.Type
             Name                        = $parameterName
+            FullName                    = $property.FullName
             Description                 = $property.Description
             IsArray                     = $property.IsArray
             IsComplexType               = $property.IsComplexType
@@ -3490,7 +3538,7 @@ function New-M365HashTableMapping
 
 
             }
-            if ($property.IsEnumType)
+            if ($property.IsEnumType -and $GraphNoun -ne 'MgDeviceManagementConfigurationPolicy')
             {
                 $enumTypeConstructor.appendLine((Get-EnumTypeConstructorToString -Property $property -IndentCount 2 -DateFormat $DateFormat))| out-null
             }
@@ -3537,30 +3585,7 @@ function New-M365HashTableMapping
         }
     }
 
-    $defaultKeys=@(
-        'Ensure'
-        'Credential'
-        'ApplicationId'
-        'TenantId'
-        'ApplicationSecret'
-        'CertificateThumbprint'
-        'Managedidentity'
-    )
-    foreach ($key in $defaultKeys)
-    {
-        $keyValue = "`$$key"
-        if ($key -eq 'Ensure')
-        {
-            $keyValue = "'Present'"
-        }
-        if ($key -eq 'ManagedIdentity')
-        {
-            $keyValue = '$ManagedIdentity.IsPresent'
-        }
 
-        $spacing = $biggestParamaterLength - $key.length
-        $hashtable += "            $($key + ' ' * $spacing) = $keyValue`r`n"
-    }
 
     $settingCatalogComplexConstructor =@"
         $complexTemplateReference = @{
@@ -3588,6 +3613,72 @@ function New-M365HashTableMapping
 
 "@
 
+
+    #Format Settings
+    if ($GraphNoun -eq 'MgDeviceManagementConfigurationPolicy')
+    {
+        $settingCatalogBuilder = [System.Text.StringBuilder]::New()
+        $indent = '    ' * 2
+        foreach ($property in $properties)
+        {
+            $prefix = 'simple'
+            if ($property.IsComplexType)
+            {
+                $prefix = 'complex'
+            }
+            $settingCatalogBuilder.AppendLine("$indent`$setting = `$getValue.settings.SettingInstance | Where-Object {`$_.settingDefinitionId -eq '$($property.FullName)'}") | Out-Null
+            $settingCatalogBuilder.AppendLine((Get-SettingCatalogSettingScriptBlockString -Property $property -Prefix $prefix))
+        }
+        $complexTypeConstructor = $settingCatalogBuilder
+    }
+
+    #Format Hashtable
+    if ($GraphNoun -eq 'MgDeviceManagementConfigurationPolicy')
+    {
+        $hashtable = ''
+        $indentCount = 3
+        $indent = '    ' * $indentCount
+        foreach ($property in $properties)
+        {
+            $spacing = $biggestParamaterLength - $property.Name.length
+            $propertyName = Get-StringFirstCharacterToUpper -Value $property.Name
+            $hashtable += "$indent$($propertyName + (' ' * $spacing) ) = "
+            if ($propertyName -in ("Id","Name"))
+            {
+                $hashtable += "`$getValue.$($propertyName)`r`n"
+            }
+            else
+            {
+                $hashtable += "`$$(if($property.IsComplexType){'complex'}else{'simple'})$($propertyName)`r`n"
+            }
+        }
+    }
+
+    $defaultKeys=@(
+        'Ensure'
+        'Credential'
+        'ApplicationId'
+        'TenantId'
+        'ApplicationSecret'
+        'CertificateThumbprint'
+        'Managedidentity'
+    )
+    foreach ($key in $defaultKeys)
+    {
+        $keyValue = "`$$key"
+        if ($key -eq 'Ensure')
+        {
+            $keyValue = "'Present'"
+        }
+        if ($key -eq 'ManagedIdentity')
+        {
+            $keyValue = '$ManagedIdentity.IsPresent'
+        }
+
+        $spacing = $biggestParamaterLength - $key.length
+        $hashtable += "            $($key + ' ' * $spacing) = $keyValue`r`n"
+    }
+
     $results.Add('ConvertToVariable', $convertToVariable)
     #$results.Add('ComplexTypeConstructor', $(if($GraphNoun -eq 'MgDeviceManagementConfigurationPolicy'){$settingCatalogComplexConstructor}else{$complexTypeConstructor.ToString()}))
     $results.Add('ComplexTypeConstructor', $complexTypeConstructor.ToString())
@@ -3599,6 +3690,101 @@ function New-M365HashTableMapping
     $results.Add('StringContent', $hashtable)
     $results.Add('ComplexTypeContent', $complexTypeContent)
     return $results
+}
+
+function Get-SettingCatalogSettingScriptBlockString
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param (
+        [Parameter()]
+        $Property,
+
+        [Parameter()]
+        [System.UInt32]
+        $IndentCount = 2,
+
+        [Parameter()]
+        [System.String]
+        $Prefix = 'simple',
+
+        [Parameter()]
+        [System.String]
+        $SettingPath= '$setting.AdditionalProperties.' ,
+
+        [Parameter()]
+        [System.String]
+        $HashtableName
+
+
+    )
+
+    $settingCatalogBuilder = [System.Text.StringBuilder]::New()
+    $indent = '    ' * $indentCount
+    $propertyName = Get-StringFirstCharacterToUpper -Value $property.Name
+
+    if ($Property.IsComplexType)
+    {
+        $pName = $Property.OriginalType.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','Value')
+        $pName = Get-StringFirstCharacterToLower -Value $pName
+        $settingCatalogBuilder.AppendLine("$indent`$child$($property.Name) = $SettingPath$pname.children | Where-Object {`$_.settingDefinitionId -eq '$($property.FullName)'}") | Out-Null
+        $settingCatalogBuilder.AppendLine("$indent`$$Prefix$propertyName = @{}") | Out-Null
+        #$indentCount ++
+        $indent = '    ' * $indentCount
+        foreach ($child in $Property.Properties)
+        {
+            $childSettingPath="`$child$($property.Name)."
+            if($child.IsComplexType)
+            {
+                #$childSettingPath="`$child$($property.Name).children."
+            }
+            $childBlock = Get-SettingCatalogSettingScriptBlockString `
+                            -Property $child `
+                            -IndentCount $IndentCount `
+                            -Prefix 'hash' `
+                            -SettingPath $childSettingPath `
+                            -HashtableName "$Prefix$($property.Name)"
+
+            if (-not [String]::isNullOrWhiteSpace($childBlock))
+            {
+                #$childBlock = $childBlock.TrimEnd()
+                $settingCatalogBuilder.AppendLine($childBlock) | Out-Null
+            }
+        }
+        if($child.OriginalType -like '*choice*')
+        {
+            $settingCatalogBuilder.AppendLine("$indent`$$Prefix$propertyName.Add('Value',`$child$($property.Name).$pName.value)") | Out-Null
+        }
+
+        $valueBlock = "$indent`$$propertyName = `$hash$($property.Name)"
+        if(-not([String]::IsNullOrWhiteSpace($HashtableName)))
+        {
+            $valueBlock = "$indent`$$HashtableName.Add('$($property.Name)',`$hash$($property.Name))"
+        }
+        $settingCatalogBuilder.AppendLine($valueBlock) | Out-Null
+        #$indentCount --
+        #$settingCatalogBuilder.AppendLine("`r`n") | Out-Null
+        $indent = '    ' * $indentCount
+    }
+    else
+    {
+        #Enum are managed from Get-EnumTypeConstructorToString
+        #if (-not($indentCount -eq 2 -and $property.IsEnumType))
+        if ($property.Name -ne 'Value')
+        {
+            $pName = $property.OriginalType.replace('#microsoft.graph.deviceManagementConfiguration','').replace('Instance','Value')
+            $pName = Get-StringFirstCharacterToLower -Value $pName
+            $pName += ".value"
+            $valueBlock = "$indent`$$Prefix$propertyName = $SettingPath$pName"
+            if(-not([String]::IsNullOrWhiteSpace($HashtableName)))
+            {
+                $valueBlock = "$indent`$$HashtableName.Add('$($property.Name)',$SettingPath$pName)"
+            }
+            $settingCatalogBuilder.AppendLine($valueBlock) | Out-Null
+        }
+    }
+    return $settingCatalogBuilder.ToString()
+
 }
 function Get-SettingCatalogSettingValuePathFromDefinition
 {
