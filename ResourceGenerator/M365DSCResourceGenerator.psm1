@@ -97,7 +97,7 @@ function New-M365DSCResource
                 throw "Cmdlet {$GetcmdletName} was not found"
             }
         }
-        Select-MgProfile $APIVersion
+
         $cmdletFound = Get-Command $GetcmdletName -ErrorAction SilentlyContinue
         $GraphModule = $cmdletFound.ModuleName
         Import-Module $GraphModule -ErrorAction Stop
