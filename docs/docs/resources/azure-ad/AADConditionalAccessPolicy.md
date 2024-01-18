@@ -8,6 +8,8 @@
 | **Id** | Write | String | Specifies the GUID for the Policy. | |
 | **State** | Write | String | Specifies the State of the Policy. | `disabled`, `enabled`, `enabledForReportingButNotEnforced` |
 | **IncludeApplications** | Write | StringArray[] | Cloud Apps in scope of the Policy. | |
+| **ApplicationsFilter** | Write | String | Rule syntax is similar to that used for membership rules for groups in Microsoft Entra ID. | |
+| **ApplicationsFilterMode** | Write | String | Mode to use for the filter. Possible values are include or exclude. | `include`, `exclude` |
 | **ExcludeApplications** | Write | StringArray[] | Cloud Apps out of scope of the Policy. | |
 | **IncludeUserActions** | Write | StringArray[] | User Actions in scope of the Policy. | |
 | **IncludeUsers** | Write | StringArray[] | Users in scope of the Policy. | |
@@ -104,12 +106,10 @@ Configuration Example
 
     node localhost
     {
-        AADConditionalAccessPolicy 'Allin-example'
+        AADConditionalAccessPolicy 'ConditionalAccessPolicy'
         {
-            ApplicationEnforcedRestrictionsIsEnabled = $False;
             BuiltInControls                          = @("mfa");
             ClientAppTypes                           = @("all");
-            CloudAppSecurityIsEnabled                = $False;
             Credential                               = $Credscredential;
             DeviceFilterMode                         = "exclude";
             DeviceFilterRule                         = "device.trustType -eq `"AzureAD`" -or device.trustType -eq `"ServerAD`" -or device.trustType -eq `"Workplace`"";
@@ -119,7 +119,6 @@ Configuration Example
             GrantControlOperator                     = "OR";
             IncludeApplications                      = @("All");
             IncludeRoles                             = @("Attack Payload Author");
-            PersistentBrowserIsEnabled               = $False;
             SignInFrequencyInterval                  = "timeBased";
             SignInFrequencyIsEnabled                 = $True;
             SignInFrequencyType                      = "hours";
@@ -148,12 +147,10 @@ Configuration Example
 
     node localhost
     {
-        AADConditionalAccessPolicy 'Allin-example'
+        AADConditionalAccessPolicy 'ConditionalAccessPolicy'
         {
-            ApplicationEnforcedRestrictionsIsEnabled = $False;
             BuiltInControls                          = @("mfa");
             ClientAppTypes                           = @("all");
-            CloudAppSecurityIsEnabled                = $True; # Updated Porperty
             Credential                               = $Credscredential;
             DeviceFilterMode                         = "exclude";
             DeviceFilterRule                         = "device.trustType -eq `"AzureAD`" -or device.trustType -eq `"ServerAD`" -or device.trustType -eq `"Workplace`"";
@@ -163,11 +160,10 @@ Configuration Example
             GrantControlOperator                     = "OR";
             IncludeApplications                      = @("All");
             IncludeRoles                             = @("Attack Payload Author");
-            PersistentBrowserIsEnabled               = $False;
             SignInFrequencyInterval                  = "timeBased";
             SignInFrequencyIsEnabled                 = $True;
             SignInFrequencyType                      = "hours";
-            SignInFrequencyValue                     = 1;
+            SignInFrequencyValue                     = 2; # Updated Porperty
             State                                    = "disabled";
         }
     }
@@ -192,9 +188,9 @@ Configuration Example
 
     node localhost
     {
-        AADConditionalAccessPolicy 'Allin-example'
+        AADConditionalAccessPolicy 'ConditionalAccessPolicy'
         {
-            DisplayName                          = 'Allin-example'
+            DisplayName                          = 'Example CAP'
             Ensure                               = 'Absent'
             Credential                           = $Credscredential
         }

@@ -104,12 +104,14 @@ function Get-TargetResource
     {
         $getValue = $null
 
-        #region resource generator code
-        $getValue = Get-MgBetaEntitlementManagementAccessPackage -AccessPackageId $id `
-            -ExpandProperty "accessPackageResourceRoleScopes(`$expand=accessPackageResourceRole,accessPackageResourceScope)" `
-            -ErrorAction SilentlyContinue
+        if (-not [System.String]::IsNullOrEmpty($id))
+        {
+            $getValue = Get-MgBetaEntitlementManagementAccessPackage -AccessPackageId $id `
+                -ExpandProperty "accessPackageResourceRoleScopes(`$expand=accessPackageResourceRole,accessPackageResourceScope)" `
+                -ErrorAction SilentlyContinue
+        }
 
-        if ($null -eq $getValue)
+        if ($null -eq $getValue -and -not [System.String]::IsNullOrEmpty($id))
         {
             Write-Verbose -Message "Nothing with id {$id} was found"
 
@@ -121,7 +123,6 @@ function Get-TargetResource
                     -ErrorAction SilentlyContinue
             }
         }
-        #endregion
 
         if ($null -eq $getValue)
         {
@@ -782,10 +783,10 @@ function Test-TargetResource
     $CurrentValues = Get-TargetResource @PSBoundParameters
     $ValuesToCheck = ([Hashtable]$PSBoundParameters).clone()
 
-    if ($CurrentValues.Ensure -eq 'Absent')
+    if ($CurrentValues.Ensure -eq 'Absent' -and $Ensure -eq 'Absent')
     {
-        Write-Verbose -Message "Test-TargetResource returned $false"
-        return $false
+        Write-Verbose -Message "Test-TargetResource returned $true"
+        return $true
     }
     $testResult = $true
 
@@ -800,6 +801,11 @@ function Test-TargetResource
             foreach ($s in [Array]$source)
             {
                 $s.remove('Id')
+            }
+
+            if ($target.getType().Name -like '*CimInstance*')
+            {
+                $target = Get-M365DSCDRGComplexTypeToHashtable -ComplexObject $target
             }
             foreach ($t in [Array]$target)
             {
