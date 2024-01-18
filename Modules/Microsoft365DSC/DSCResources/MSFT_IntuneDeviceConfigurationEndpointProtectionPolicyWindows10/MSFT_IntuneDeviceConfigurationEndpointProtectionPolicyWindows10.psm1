@@ -3706,6 +3706,8 @@ function Set-TargetResource
         }
         #region resource generator code
         $CreateParameters.Add("@odata.type", "#microsoft.graph.windows10EndpointProtectionConfiguration")
+        Test-IntuneFlagParameterValue -ReferenceFlags @("notConfigured","remoteAccess","wireless","lan") -ReferenceParameterName "InterfaceTypes" -StringValue $CreateParameters.FirewallRules.InterfaceTypes
+        Test-IntuneFlagParameterValue -ReferenceFlags @("notConfigured","domain","private","public") -ReferenceParameterName "ProfileTypes" -StringValue $CreateParameters.FirewallRules.ProfileTypes
         $policy = New-MgBetaDeviceManagementDeviceConfiguration -BodyParameter $CreateParameters
         $assignmentsHash = @()
         foreach($assignment in $Assignments)
@@ -3741,6 +3743,8 @@ function Set-TargetResource
         }
         #region resource generator code
         $UpdateParameters.Add("@odata.type", "#microsoft.graph.windows10EndpointProtectionConfiguration")
+        Test-IntuneFlagParameterValue -ReferenceFlags @("notConfigured","remoteAccess","wireless","lan") -ReferenceParameterName "InterfaceTypes" -StringValues $UpdateParameters.FirewallRules.InterfaceTypes
+        Test-IntuneFlagParameterValue -ReferenceFlags @("notConfigured","domain","private","public") -ReferenceParameterName "ProfileTypes" -StringValues $UpdateParameters.FirewallRules.ProfileTypes
         Update-MgBetaDeviceManagementDeviceConfiguration  `
             -DeviceConfigurationId $currentInstance.Id `
             -BodyParameter $UpdateParameters

@@ -1387,3 +1387,72 @@ function Get-OmaSettingPlainTextValue
         return $null
     }
 }
+
+
+function Test-IntuneFlagParameterValue
+{
+    [CmdletBinding()]
+    [OutputType([System.Boolean])]
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.String[]]
+        $ReferenceFlags,
+
+        [Parameter(Mandatory = $true)]
+        [System.String]
+        $ReferenceParameterName,
+
+        [Parameter()]
+        [system.String[]]
+        $StringValues
+    )
+
+    $validatedValues = $true
+    foreach($StringValue in $StringValues)
+    {
+        $arrayValues = $StringValue -split ","
+
+        foreach ($value in $arrayValues)
+        {
+            $validatedValues = $value -in $ReferenceFlags
+            if (-not $validatedValues)
+            {
+                $Message = "[ModelValidationFailure] : The parameter '$ReferenceParameterName' contains invalid value. Possible values: $($ReferenceFlags -join ",")"
+                New-M365DSCLogEntry -Message $Message `
+                    -Exception $_ `
+                    -Source $($MyInvocation.MyCommand.Source) `
+                    -TenantId $TenantId `
+                    -Credential $Credential
+                throw ($Message)
+            }
+        }
+    }
+
+    return $validatedValues
+}
+function ConvertFrom-IntuneFlagParameterValue
+{
+    [CmdletBinding()]
+    [OutputType([System.String[]])]
+    param (
+        [Parameter()]
+        [system.String]
+        $StringValue
+    )
+
+    return $StringValue -split ","
+}
+
+
+function ConvertTo-IntuneFlagParameterValue
+{
+    [CmdletBinding()]
+    [OutputType([System.String])]
+    param (
+        [Parameter()]
+        [system.String[]]
+        $FlagValues
+    )
+
+    return $FlagValues -join ","
+}
